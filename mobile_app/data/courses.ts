@@ -1614,6 +1614,324 @@ CONDUITE DE NUIT:
         ]
       }
     ]
+  },
+
+  // ==================== MODULE 11: TRANSPORT DE MATIÈRES DANGEREUSES ====================
+  {
+    id: 'matieres_dangereuses',
+    title: 'Transport de Matières Dangereuses',
+    titleAr: 'نقل المواد الخطرة',
+    icon: '☢️',
+    color: '#ff6b35',
+    chapters: [
+      {
+        id: 'classification_md',
+        title: 'Classification des matières dangereuses',
+        titleAr: 'تصنيف المواد الخطرة',
+        content: `CLASSIFICATION DES MATIÈRES DANGEREUSES (OMS):
+
+🔴 CLASSE 1: EXPLOSIFS
+• Matières pouvant exploser
+• Ex: Munitions, feux d'artifice, dynamite
+• Interdit sur autoroute
+
+🟠 CLASSE 2: GAZ
+• Gaz comprimés, liquéfiés, dissous
+• Ex: Propane, oxygène, hydrogène
+• Bouteilles bien fixées et ventilées
+
+🟡 CLASSE 3: LIQUIDES INFLAMMABLES
+• Point éclair < 61°C
+• Ex: Essence, alcool, kérosène
+• Interdiction de fumer à proximité
+
+🟤 CLASSE 4: SOLIDES INFLAMMABLES
+• 4a: Inflammables
+• 4b: Inflammables au contact de l'eau
+• 4c: Auto-oxydants
+
+🔵 CLASSE 5: OXYDANTS ET ORGANIQUES PEROXYDÉS
+• Soutiennent la combustion
+• Ex: Peroxydes, permanganates
+
+🟢 CLASSE 6: SUBSTANCES TOXIQUES ET INFECTIEUSES
+• 6a: Toxiques
+• 6b: Infectieuses
+• Ex: Pesticides, virus
+
+🟣 CLASSE 7: MATIÈRES RADIOACTIVES
+• Émettent des rayonnements ionisants
+• Ex: Uranium, cobalt 60
+• Signalisation spéciale obligatoire
+
+⚫ CLASSE 8: CORROSIFS
+• Attaquent les métaux et la peau
+• Ex: Acides, soude caustique
+
+⬜ CLASSE 9: DANGERS DIVERS
+• Matières présentant un danger
+• Ex: Amiante, batteries lithium
+
+📋 FICHE D'IDENTIFICATION:
+• Obligatoire pour chaque chargement
+• Numéro ONU (4 chiffres)
+• Nature du danger`,
+        contentAr: `تصنيف المواد الخطرة (المنظمة العالمية للصحة):
+
+🔴 الفئة 1: المتفجرات
+• مواد يمكن أن تنفجر
+• مثال: الذخيرة، الألعاب النارية، الديناميت
+• ممنوع على الطرق السريعة
+
+🟠 الفئة 2: الغازات
+• غازات مضغوطة، مسيولة، محلولة
+• مثال: البروبان، الأكسجين، الهيدروجين
+• أسطوانات مثبتة جيداً ومؤمّنة
+
+🟡 الفئة 3: السوائل القابلة للاشتعال
+• نقطة وميض < 61 درجة مئوية
+• مثال: البنزين، الكحول، الكيروسين
+• منع التدخين بالقرب
+
+🟤 الفئة 4: الصلبات القابلة للاشتعال
+• 4أ: قابلة للاشتعال
+• 4ب: قابلة للاشتعال عند ملامسة الماء
+• 4ج: مؤكسدة ذاتية
+
+🔵 الفئة 5: المؤكسدة والعضوية البيروكسيدية
+• تدعم الاحتراق
+• مثال: البيروكسيدات، البرمنغانتات
+
+🟢 الفئة 6: المواد السامة والمعدية
+• 6أ: سامة
+• 6ب: معدية
+• مثال: المبيدات الحشرية، الفيروسات
+
+🟣 الفئة 7: المواد المشعة
+• تصدر إشعاعات مؤيَّنة
+• مثال: اليورانيوم، الكوبالت 60
+• إشارة خاصة إلزامية
+
+⚫ الفئة 8: المcorrosives
+• تهاجم المعادن والجلد
+• مثال: الأحماض، الصودا الكاوية
+
+⬜ الفئة 9: مخاطر متنوعة
+• مواد تشكل خطراً
+• مثال: الأسبستوس، بطاريات الليثيوم
+
+📋 بطاقة التعريف:
+• إلزامية لكل شحنة
+• رقم الأونو (4 أرقام)
+• طبيعة الخطر`,
+        keyPoints: [
+          '9 classes de matières dangereuses selon l\'OMS',
+          'Chaque classe a ses règles de transport',
+          'Fiche d\'identification obligatoire',
+          'Signalisation spécifique sur le véhicule'
+        ],
+        keyPointsAr: [
+          '9 فئات من المواد الخطرة حسب المنظمة العالمية للصحة',
+          'كل فئة لها قواعد نقل خاصة بها',
+          'بطاقة تعريف إلزامية',
+          'إشارة محددة على المركبة'
+        ],
+        tips: [
+          'Mémorisez les classes par couleur: Rouge=Explosif, Orange=Gaz, Jaune=Liquide inflammable',
+          'Le numéro ONU identifie la matière',
+          'En cas de doute, ne pas approcher'
+        ],
+        tipsAr: [
+          'تذكر الفئات بالألوان: أحمر=متفجر، برتقالي=غاز، أصفر=سائل قابل للاشتعال',
+          'رقم الأونو يحدد المادة',
+          'في حالة الشك، لا تقترب'
+        ]
+      },
+      {
+        id: 'regles_transport_md',
+        title: 'Règles de transport',
+        titleAr: 'قواعد النقل',
+        content: `RÈGLES GÉNÉRALES DU TRANSPORT:
+
+🚛 CHARGEMENT:
+• Les matières dangereuses doivent être correctement identifiées
+• Utiliser des emballages agréés et conformes
+• Fixer solidement les marchandises
+• Ne pas mélanger des matières incompatibles
+• Ventilation correcte du véhicule
+
+📋 DOCUMENTATION OBLIGATOIRE:
+• Fiche d'identification des risques
+• Autorisation de transport (si > 3,5 tonnes)
+• Permis de conduire spécialisé (catégorie C, D ou E)
+• Attestation de formation du conducteur
+
+⏰ CONDITIONS DE CONDUITE:
+• Respecter les itinéraires autorisés
+• Interdiction de circuler la nuit (selon substances)
+• Pause obligatoire toutes les 4,5 heures
+• Ne pas fumer dans le véhicule
+• Interdiction de dormir dans le véhicule chargé
+
+📏 DISTANCES DE SÉCURITÉ:
+• Doubler les distances normales
+• Augmenter la vitesse de réaction
+• Prise en compte de l'arrêt prolongé
+
+⚠️ INTERDICTIONS:
+• Dépasser les véhicules transportant des explosifs
+• Stationner à proximité des habitations
+• Utiliser les feux de stationnement en marche
+• Laisser le véhicule non surveillé`,
+        contentAr: `القواعد العامة للنقل:
+
+🚛 التحميل:
+• يجب تحديد المواد الخطرة بشكل صحيح
+• استخدام تغليف معتمد ومتوافق
+• تثبيت البضائع بصلابة
+• عدم خلط مواد غير متوافقة
+• تهوية صحيحة للمركبة
+
+📋 الوثائق الإلزامية:
+• بطاقة تعريف المخاطر
+• تصريح النقل (إذا > 3,5 طن)
+• رخصة قيادة متخصصة (الفئة C, D أو E)
+• شهادة تدريب السائق
+
+⏰ ظروف القيادة:
+• احترام المسارات المرخصة
+• منع السير ليلاً (حسب المواد)
+• استراحة إلزامية كل 4,5 ساعات
+• عدم التدخين في المركبة
+• منع النوم في المركبة المحملة
+
+📏 مسافات الأمان:
+• تضاعف المسافات العادية
+• زيادة سرعة رد الفعل
+• مراعاة التوقف الطويل
+
+⚠️ الحظر:
+• تجاوز المركبات الناقلة للمتفجرات
+• الوقوف بالقرب من المساكن
+• استخدام أضواء الوقوف أثناء السير
+• ترك المركبة دون مراقبة`,
+        keyPoints: [
+          'Emballages agréés et documentation obligatoire',
+          'Permis spécialisé obligatoire (C, D, E)',
+          'Pas de conduite la nuit pour certaines matières',
+          'Itinéraires autorisés uniquement'
+        ],
+        keyPointsAr: [
+          'تغليف معتمد ووثائق إلزامية',
+          'رخصة متخصصة إلزامية (C, D, E)',
+          'لا قيادة ليلاً لبعض المواد',
+          'المسارات المرخصة فقط'
+        ],
+        tips: [
+          'Connaître le contenu du chargement avant de prendre le volant',
+          'Vérifier les documents AVANT le départ',
+          'Respecter scrupuleusement les itinéraires'
+        ],
+        tipsAr: [
+          'اعرف محتوى الشحنة قبل الجلوس خلف المقود',
+          'تحقق من الوثائق قبل المغادرة',
+          'احترم المسارات بدقة'
+        ]
+      },
+      {
+        id: 'signalisation_md',
+        title: 'Signalisation des véhicules',
+        titleAr: 'إشارة المركبات',
+        content: `SIGNALISATION DES VÉHICULES TRANSPORTANT DES MD:
+
+🔶 PANNEAUX橙SIGNALISATION:
+• Rectangle orange avec chiffre noir
+• Placé AVANT et ARRIÈRE du véhicule
+• Indique la classe de danger
+
+🔺 TABLEAUX橙AVANT ET ARRIÈRE:
+• Tableau orange = Danger principal
+• Numéro = Numéro d'identification du danger
+• Deux tableaux si chargement multiple
+
+🔴 LUMIÈRES橙SIGNALISATION:
+• Feux orange clignotants (extrémités)
+• Activer le jour comme la nuit
+• En cas d'arrêt prolongé
+
+🏷️ ÉTiquettes橙IDENTIFICATION:
+• Code à 4 chiffres (ONU)
+• Pictogramme de danger
+• N° d'identification du danger
+
+📋 PANNEAU SPÉCIFIQUE:
+• Fond orange
+• Numéro du danger en noir
+• Dimensions réglementaires
+
+⚠️ EN CAS D'ACCIDENT:
+• Signaler immédiatement aux secours
+• Préciser la nature des matières
+• Éviter toute source d'inflammation
+• Ne pas toucher au chargement
+• Évacuer si nécessaire`,
+        contentAr: `إشارة المركبات الناقلة للمواد الخطرة:
+
+🔶 لافتات الإشارة:
+• مستطيل برتقالي برقم أسود
+• يُوضع أمام وخلف المركبة
+• يدل على فئة الخطر
+
+🔺 ألواح أمامية وخلفية:
+• لوح برتقالي = الخطر الرئيسي
+• رقم = رقم تعريف الخطر
+• لوحان إذا كانت الشحنة متنوعة
+
+🔴 أضواء الإشارة:
+• أضواء برتقالية وامعة (الأطراف)
+• تفعيل نهاراً وليلاً
+• في حالة التوقف الطويل
+
+🏷️ ملصقات التعريف:
+• رمز من 4 أرقام (أونو)
+• رسم تعبيري للخطر
+• رقم تعريف الخطر
+
+📋 لافتة خاصة:
+• خلفية برتقالية
+• رقم الخطر بالأسود
+• أبعاد نظامية
+
+⚠️ في حالة الحادث:
+• الإبلاغ فوراً للإسعاف
+• تحديد طبيعة المواد
+• تجنب أي مصدر اشتعال
+• عدم لمس الشحنة
+• الإخلاء إذا لزم الأمر`,
+        keyPoints: [
+          'Tableaux orange AVANT et ARRIÈRE obligatoires',
+          'Numéro ONU à 4 chiffres sur les tableaux',
+          'Feux orange clignotants en cas d'arrêt prolongé',
+          'Ne jamais toucher au chargement en cas d\'accident'
+        ],
+        keyPointsAr: [
+          'ألواح برتقالية أمامية وخلفية إلزامية',
+          'رقم أونو من 4 أرقام على الألواح',
+          'أضواء برتقالية وامعة في حالة التوقف الطويل',
+          'لا تلمس الشحنة أبداً في حالة الحادث'
+        ],
+        tips: [
+          'Les panneaux orange signifient: Attention, charge dangereuse!',
+          'Vérifiez que tous les panneaux sont bien visibles',
+          'En cas de doute, éloignez-vous immédiatement'
+        ],
+        tipsAr: [
+          'الألواح البرتقالية تعني: انتباه، شحنة خطرة!',
+          'تحقق من أن جميع الألواح مرئية جيداً',
+          'في حالة الشك، ابتعد فوراً'
+        ]
+      }
+    ]
   }
 ];
 
