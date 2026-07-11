@@ -42,7 +42,7 @@ Application mobile complète pour préparer l'examen du code de la route en Tuni
 
 ```bash
 # Cloner le repository
-git clone https://github.com/VOTRE_USERNAME/code-de-la-route-tunisie.git
+git clone https://github.com/HiTechTN/code-de-la-route-tunisie.git
 cd code-de-la-route-tunisie
 
 # Installer les dépendances
