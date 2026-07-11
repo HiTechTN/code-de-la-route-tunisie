@@ -1844,22 +1844,22 @@ CONDUITE DE NUIT:
         titleAr: 'إشارة المركبات',
         content: `SIGNALISATION DES VÉHICULES TRANSPORTANT DES MD:
 
-🔶 PANNEAUX橙SIGNALISATION:
+🔶 PANNEAUX ORANGE DE SIGNALISATION:
 • Rectangle orange avec chiffre noir
 • Placé AVANT et ARRIÈRE du véhicule
 • Indique la classe de danger
 
-🔺 TABLEAUX橙AVANT ET ARRIÈRE:
+🔺 TABLEAUX ORANGE AVANT ET ARRIÈRE:
 • Tableau orange = Danger principal
 • Numéro = Numéro d'identification du danger
 • Deux tableaux si chargement multiple
 
-🔴 LUMIÈRES橙SIGNALISATION:
+🔴 LUMIÈRES ORANGE DE SIGNALISATION:
 • Feux orange clignotants (extrémités)
 • Activer le jour comme la nuit
 • En cas d'arrêt prolongé
 
-🏷️ ÉTiquettes橙IDENTIFICATION:
+🏷️ ÉTIQUETTES D'IDENTIFICATION:
 • Code à 4 chiffres (ONU)
 • Pictogramme de danger
 • N° d'identification du danger
