@@ -321,7 +321,8 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: "La vitesse maximale sur autoroute en Tunisie est de 120 km/h.",
     explanationAr: "السرعة القصوى على الطريق السريع في تونس هي 120 كم/ساعة.",
-    difficulty: 'facile'
+    difficulty: 'facile',
+  image: 'img_0168.jpeg'
   },
   {
     id: 23,
@@ -849,7 +850,8 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 3,
     explanation: "Le numéro des sapeurs-pompiers en Tunisie est le 198.",
     explanationAr: "رقم الإطفاء في تونس هو 198.",
-    difficulty: 'facile'
+    difficulty: 'facile',
+  image: 'img_0488.jpeg'
   },
   {
     id: 63,
@@ -1059,7 +1061,8 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: "La profondeur minimale légale de sculpture est de 1,6 mm.",
     explanationAr: "الحد الأدنى القانوني لعمق النقش هو 1,6 مم.",
-    difficulty: 'moyen'
+    difficulty: 'moyen',
+  image: 'img_0616.jpeg'
   },
   {
     id: 79,
@@ -1217,7 +1220,8 @@ export const QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: "Couper le moteur à l'arrêt réduit la consommation et les émissions de 20%.",
     explanationAr: "إيقاف المحرك عند التوقف يقلل الاستهلاك والانبعاثات بنسبة 20%.",
-    difficulty: 'moyen'
+    difficulty: 'moyen',
+  image: 'img_0712.jpeg'
   },
 
   // ==================== REGLEMENT ====================

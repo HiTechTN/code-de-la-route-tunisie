@@ -18,14 +18,59 @@ import {
   COURSE_MODULES, getModuleById, getTotalChapters,
   type CourseModule, type Chapter 
 } from './data/courses';
+import { TRANSLATIONS, t, getCategoryName, type Language } from './data/translations';
 
 const { width, height } = Dimensions.get('window');
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // ==================== TYPES ====================
-type QuizMode = 'practice' | 'exam' | 'category';
-type Language = 'fr' | 'ar';
+type QuizMode = 'practice' | 'exam' | 'category' | 'favorites';
+
+// ==================== LANGUAGE CONTEXT ====================
+type LanguageContextType = {
+  language: Language;
+  toggleLanguage: () => void;
+  isArabic: boolean;
+};
+
+const LanguageContext = React.createContext<LanguageContextType>({
+  language: 'fr',
+  toggleLanguage: () => {},
+  isArabic: false,
+});
+
+const useLanguage = () => React.useContext(LanguageContext);
+
+const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
+  const [language, setLanguage] = useState<Language>('fr');
+  
+  useEffect(() => {
+    AsyncStorage.getItem('language').then((saved) => {
+      if (saved === 'fr' || saved === 'ar') {
+        setLanguage(saved);
+      }
+    });
+  }, []);
+
+  const toggleLanguage = async () => {
+    const newLang = language === 'fr' ? 'ar' : 'fr';
+    setLanguage(newLang);
+    await AsyncStorage.setItem('language', newLang);
+  };
+
+  const value: LanguageContextType = {
+    language,
+    toggleLanguage,
+    isArabic: language === 'ar',
+  };
+
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
 
 // ==================== THEME ====================
 const COLORS = {
@@ -112,14 +157,15 @@ function HomeScreen({ navigation }: any) {
   const [totalQuestions, setTotalQuestions] = useState(QUESTIONS.length);
   const [progress, setProgress] = useState(0);
   const [greeting, setGreeting] = useState('');
+  const { language } = useLanguage();
 
   useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Bonjour ☀️');
-    else if (hour < 18) setGreeting('Bon après-midi 🌤️');
-    else setGreeting('Bonsoir 🌙');
+    if (hour < 12) setGreeting(t('home.greetingMorning', language));
+    else if (hour < 18) setGreeting(t('home.greetingAfternoon', language));
+    else setGreeting(t('home.greetingEvening', language));
     loadProgress();
-  }, []);
+  }, [language]);
 
   const loadProgress = async () => {
     try {
@@ -136,8 +182,8 @@ function HomeScreen({ navigation }: any) {
         <View style={styles.homeHeader}>
           <View>
             <Text style={styles.greeting}>{greeting}</Text>
-            <Text style={styles.homeTitle}>Code de la Route</Text>
-            <Text style={styles.homeSubtitle}>🇹🇳 Tunisie</Text>
+            <Text style={styles.homeTitle}>{t('home.title', language)}</Text>
+            <Text style={styles.homeSubtitle}>{t('home.subtitle', language)}</Text>
           </View>
           <View style={styles.headerStats}>
             <View style={styles.headerStatItem}>
@@ -452,11 +498,25 @@ function QuizHomeScreen({ navigation, route }: any) {
   const [difficulty, setDifficulty] = useState<string>('all');
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
-  const startQuiz = () => {
+  const startQuiz = async () => {
     let questions: Question[] = [];
     
     if (selectedMode === 'exam') {
       questions = getExamQuestions();
+    } else if (selectedMode === 'favorites') {
+      try {
+        const favorites = JSON.parse(await AsyncStorage.getItem('favorites') || '[]');
+        const favQuestions = QUESTIONS.filter(q => favorites.includes(q.id));
+        if (favQuestions.length === 0) {
+          alert('Aucune question en favoris. Marquez des questions pendant le quiz !');
+          return;
+        }
+        const shuffled = [...favQuestions].sort(() => 0.5 - Math.random());
+        questions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
+      } catch (e) {
+        alert('Erreur lors du chargement des favoris');
+        return;
+      }
     } else if (selectedMode === 'category' && selectedCategory) {
       const catQuestions = getQuestionsByCategory(selectedCategory);
       questions = getRandomQuestions(questionCount, selectedCategory);
@@ -495,6 +555,7 @@ function QuizHomeScreen({ navigation, route }: any) {
             { id: 'practice', icon: '🎯', label: 'Entraînement', desc: 'Libre' },
             { id: 'exam', icon: '📝', label: 'Examen', desc: '30 questions' },
             { id: 'category', icon: '🏷️', label: 'Par catégorie', desc: 'Choisir' },
+            { id: 'favorites', icon: '⭐', label: 'Favoris', desc: 'Réviser' },
           ].map(mode => (
             <TouchableOpacity
               key={mode.id}
@@ -620,9 +681,37 @@ function QuizPlayScreen({ route, navigation }: any) {
   const [timeLeft, setTimeLeft] = useState(mode === 'exam' ? 30 * 60 : null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [showCorrect, setShowCorrect] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const q = questions[currentQuestion];
   const progress = (currentQuestion + 1) / questions.length;
+
+  // Check if current question is favorited
+  useEffect(() => {
+    checkFavorite();
+  }, [currentQuestion, q.id]);
+
+  const checkFavorite = async () => {
+    try {
+      const favorites = JSON.parse(await AsyncStorage.getItem('favorites') || '[]');
+      setIsFavorite(favorites.includes(q.id));
+    } catch (e) {}
+  };
+
+  const toggleFavorite = async () => {
+    try {
+      const favorites = JSON.parse(await AsyncStorage.getItem('favorites') || '[]');
+      let newFavorites;
+      if (favorites.includes(q.id)) {
+        newFavorites = favorites.filter((id: number) => id !== q.id);
+        setIsFavorite(false);
+      } else {
+        newFavorites = [...favorites, q.id];
+        setIsFavorite(true);
+      }
+      await AsyncStorage.setItem('favorites', JSON.stringify(newFavorites));
+    } catch (e) {}
+  };
 
   // Keep scoreRef in sync with score
   useEffect(() => { scoreRef.current = score; }, [score]);
@@ -698,6 +787,14 @@ function QuizPlayScreen({ route, navigation }: any) {
             </Text>
           </View>
         )}
+        <TouchableOpacity 
+          style={[styles.favoriteBtn, isFavorite && styles.favoriteBtnActive]}
+          onPress={toggleFavorite}
+        >
+          <Text style={[styles.favoriteBtnText, isFavorite && styles.favoriteBtnTextActive]}>
+            {isFavorite ? '★' : '☆'}
+          </Text>
+        </TouchableOpacity>
         <View style={styles.scoreBadge}>
           <Text style={styles.scoreBadgeText}>⭐ {score}</Text>
         </View>
@@ -910,6 +1007,141 @@ function QuizResultScreen({ route, navigation }: any) {
   );
 }
 
+// ==================== FAVORITES SCREEN ====================
+function FavoritesScreen({ navigation }: any) {
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [favoriteQuestions, setFavoriteQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadFavorites();
+  }, []);
+
+  const loadFavorites = async () => {
+    try {
+      const favs = JSON.parse(await AsyncStorage.getItem('favorites') || '[]');
+      setFavorites(favs);
+      const favQuestions = QUESTIONS.filter(q => favs.includes(q.id));
+      setFavoriteQuestions(favQuestions);
+    } catch (e) {}
+    setLoading(false);
+  };
+
+  const removeFavorite = async (questionId: number) => {
+    const newFavorites = favorites.filter(id => id !== questionId);
+    setFavorites(newFavorites);
+    setFavoriteQuestions(favoriteQuestions.filter(q => q.id !== questionId));
+    await AsyncStorage.setItem('favorites', JSON.stringify(newFavorites));
+  };
+
+  const startFavoriteQuiz = () => {
+    if (favoriteQuestions.length === 0) {
+      alert('Aucune question en favoris');
+      return;
+    }
+    const shuffled = [...favoriteQuestions].sort(() => 0.5 - Math.random());
+    navigation.navigate('QuizPlay', { 
+      questions: shuffled.slice(0, Math.min(10, shuffled.length)), 
+      mode: 'favorites' 
+    });
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>Chargement...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <AnimatedCard delay={0}>
+        <View style={styles.favoritesHeader}>
+          <Text style={styles.favoritesHeaderIcon}>⭐</Text>
+          <Text style={styles.favoritesHeaderTitle}>Mes Favoris</Text>
+          <Text style={styles.favoritesHeaderSubtitle}>
+            {favorites.length} question{favorites.length > 1 ? 's' : ''} marquée{favorites.length > 1 ? 's' : ''}
+          </Text>
+        </View>
+      </AnimatedCard>
+
+      {/* Stats */}
+      <AnimatedCard delay={100}>
+        <View style={styles.favoritesStats}>
+          <StatCard icon="⭐" value={favorites.length} label="Favoris" color={COLORS.warning} />
+          <StatCard icon="📝" value="Quiz" label="Réviser" color={COLORS.primary} />
+        </View>
+      </AnimatedCard>
+
+      {/* Start Quiz Button */}
+      {favorites.length > 0 && (
+        <AnimatedCard delay={200}>
+          <TouchableOpacity style={styles.startFavoriteQuizBtn} onPress={startFavoriteQuiz}>
+            <Text style={styles.startFavoriteQuizBtnText}>🎯 Quiz des Favoris</Text>
+            <Text style={styles.startFavoriteQuizBtnSubtext}>Réviser les questions marquées</Text>
+          </TouchableOpacity>
+        </AnimatedCard>
+      )}
+
+      {/* Favorite Questions List */}
+      <AnimatedCard delay={300}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>📋 Questions favorites</Text>
+        </View>
+        
+        {favoriteQuestions.length === 0 ? (
+          <View style={styles.emptyFavorites}>
+            <Text style={styles.emptyFavoritesIcon}>⭐</Text>
+            <Text style={styles.emptyFavoritesText}>Aucune question en favoris</Text>
+            <Text style={styles.emptyFavoritesSubtext}>
+              Marquez les questions difficiles pendant le quiz pour les réviser ici
+            </Text>
+          </View>
+        ) : (
+          favoriteQuestions.map((q, index) => (
+            <AnimatedCard key={q.id} delay={100 * (index + 1)}>
+              <View style={styles.favoriteQuestionCard}>
+                <View style={styles.favoriteQuestionHeader}>
+                  <View style={styles.favoriteQuestionBadges}>
+                    <Badge text={CATEGORIES.find(c => c.id === q.category)?.name || q.category} 
+                           color={CATEGORIES.find(c => c.id === q.category)?.color || COLORS.primary} />
+                    <Badge text={q.difficulty} color={
+                      q.difficulty === 'facile' ? COLORS.success : 
+                      q.difficulty === 'moyen' ? COLORS.warning : COLORS.danger
+                    } />
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.removeFavoriteBtn}
+                    onPress={() => removeFavorite(q.id)}
+                  >
+                    <Text style={styles.removeFavoriteBtnText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.favoriteQuestionText} numberOfLines={2}>{q.question}</Text>
+                <View style={styles.favoriteQuestionActions}>
+                  <TouchableOpacity 
+                    style={styles.reviewFavoriteBtn}
+                    onPress={() => navigation.navigate('QuizPlay', { 
+                      questions: [q], 
+                      mode: 'practice' 
+                    })}
+                  >
+                    <Text style={styles.reviewFavoriteBtnText}>📝 Réviser</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </AnimatedCard>
+          ))
+        )}
+      </AnimatedCard>
+
+      <View style={{ height: 100 }} />
+    </ScrollView>
+  );
+}
+
 // ==================== STATS SCREEN ====================
 function StatsScreen() {
   const [stats, setStats] = useState({
@@ -1082,6 +1314,14 @@ function HomeTabs() {
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>❓</Text>,
           tabBarLabel: 'Quiz',
+        }}
+      />
+      <Tab.Screen 
+        name="FavoritesTab" 
+        component={FavoritesScreen}
+        options={{
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>⭐</Text>,
+          tabBarLabel: 'Favoris',
         }}
       />
       <Tab.Screen 
@@ -2192,5 +2432,164 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: 11,
     ...FONTS.medium,
+  },
+
+  // Favorites Screen
+  favoritesHeader: {
+    alignItems: 'center',
+    padding: 24,
+    margin: 16,
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  favoritesHeaderIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  favoritesHeaderTitle: {
+    fontSize: 22,
+    ...FONTS.bold,
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  favoritesHeaderSubtitle: {
+    fontSize: 14,
+    color: COLORS.textLight,
+  },
+  favoritesStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  startFavoriteQuizBtn: {
+    backgroundColor: COLORS.warning,
+    marginHorizontal: 16,
+    padding: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: COLORS.warning,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  startFavoriteQuizBtnText: {
+    fontSize: 17,
+    ...FONTS.bold,
+    color: COLORS.white,
+  },
+  startFavoriteQuizBtnSubtext: {
+    fontSize: 13,
+    color: COLORS.white,
+    marginTop: 4,
+    opacity: 0.9,
+  },
+  emptyFavorites: {
+    alignItems: 'center',
+    padding: 40,
+    marginHorizontal: 16,
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+  },
+  emptyFavoritesIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+    opacity: 0.5,
+  },
+  emptyFavoritesText: {
+    fontSize: 18,
+    ...FONTS.semibold,
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  emptyFavoritesSubtext: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  favoriteQuestionCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 10,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  favoriteQuestionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  favoriteQuestionBadges: {
+    flexDirection: 'row',
+    gap: 8,
+    flex: 1,
+  },
+  removeFavoriteBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.danger + '15',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeFavoriteBtnText: {
+    fontSize: 14,
+    color: COLORS.danger,
+    ...FONTS.bold,
+  },
+  favoriteQuestionText: {
+    fontSize: 14,
+    color: COLORS.text,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  favoriteQuestionActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  reviewFavoriteBtn: {
+    backgroundColor: COLORS.primary + '10',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  reviewFavoriteBtnText: {
+    fontSize: 13,
+    color: COLORS.primary,
+    ...FONTS.semibold,
+  },
+
+  // Favorite Button
+  favoriteBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  favoriteBtnActive: {
+    backgroundColor: COLORS.warning + '20',
+  },
+  favoriteBtnText: {
+    fontSize: 22,
+    color: COLORS.textMuted,
+  },
+  favoriteBtnTextActive: {
+    color: COLORS.warning,
   },
 });
