@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: mobile_app/package.json
 
       - name: Setup Expo CLI
         run: npm install -g eas-cli
