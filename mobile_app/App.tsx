@@ -1,3 +1,4 @@
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -7,7 +8,7 @@ import {
   TextInput, Modal, Dimensions, Platform, Animated,
   Share, Vibration, useWindowDimensions
 } from 'react-native';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
   QUESTIONS, CATEGORIES, getQuestionsByCategory, 
@@ -996,7 +997,7 @@ function QuizPlayScreen({ route, navigation }: any) {
         {/* Options */}
         <AnimatedCard delay={100}>
           <View style={styles.optionsContainer}>
-            {q.options.map((option, i) => {
+            {q.options.map((option: string, i: number) => {
               const isSelected = selectedAnswer === i;
               const isCorrect = i === q.correctAnswer;
               const showResult = isAnswered;
@@ -1106,6 +1107,29 @@ function QuizResultScreen({ route, navigation }: any) {
           await AsyncStorage.setItem('studyStreak', '1');
         }
         await AsyncStorage.setItem('lastStudyDate', today);
+      }
+
+      // Update hazardous materials progress if mode is 'hazardous'
+      if (mode === 'hazardous') {
+        try {
+          const savedProgress = await AsyncStorage.getItem('hazardousProgress');
+          const progress = savedProgress ? JSON.parse(savedProgress) : {
+            chaptersViewed: [],
+            questionsAnswered: 0,
+            questionsCorrect: 0,
+            flashcardsMastered: 0,
+            quizzesCompleted: 0,
+          };
+          
+          const newProgress = {
+            ...progress,
+            questionsAnswered: progress.questionsAnswered + total,
+            questionsCorrect: progress.questionsCorrect + score,
+            quizzesCompleted: progress.quizzesCompleted + 1,
+          };
+          
+          await AsyncStorage.setItem('hazardousProgress', JSON.stringify(newProgress));
+        } catch (e) {}
       }
     } catch (e) {}
   };
@@ -3812,5 +3836,106 @@ const styles = StyleSheet.create({
   },
   flashcardDotMastered: {
     backgroundColor: COLORS.success,
+
+  // Hazardous Materials Summary Styles
+  hmSummaryCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  hmSummaryTitle: {
+    fontSize: 16,
+    ...FONTS.semibold,
+    color: COLORS.text,
+    marginBottom: 16,
+  },
+  hmSummaryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  hmSummaryItem: {
+    width: "48%",
+    alignItems: "center",
+    padding: 12,
+    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  hmSummaryIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  hmSummaryValue: {
+    fontSize: 20,
+    ...FONTS.bold,
+    marginBottom: 4,
+  },
+  hmSummaryLabel: {
+    fontSize: 11,
+    color: COLORS.textLight,
+    textAlign: "center",
+  },
+  hmSummaryAccuracy: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  hmSummaryAccuracyLabel: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginBottom: 8,
+  },
+  hmSummaryAccuracyBar: {
+    marginBottom: 4,
+  },
+  hmSummaryAccuracyValue: {
+    fontSize: 16,
+    ...FONTS.bold,
+    textAlign: "right",
+  },
+  hmSummaryTimeline: {
+    marginTop: 16,
+  },
+  hmSummaryTimelineTitle: {
+    fontSize: 14,
+    ...FONTS.semibold,
+    color: COLORS.text,
+    marginBottom: 12,
+  },
+  hmSummaryTimelineItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  hmSummaryTimelineDot: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.background,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  hmSummaryTimelineDotText: {
+    fontSize: 12,
+    ...FONTS.bold,
+  },
+  hmSummaryTimelineText: {
+    fontSize: 13,
+    color: COLORS.textLight,
+    flex: 1,
+  },
+  hmSummaryTimelineTextCompleted: {
+    color: COLORS.success,
+    ...FONTS.semibold,
+  },
   },
 });
