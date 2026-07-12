@@ -42,6 +42,101 @@ const useResponsive = () => {
 // ==================== TYPES ====================
 type QuizMode = 'practice' | 'exam' | 'category' | 'favorites' | 'hazardous';
 
+type Achievement = {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  requirement: string;
+  unlocked: boolean;
+  unlockedDate?: string;
+};
+
+const ACHIEVEMENTS: Achievement[] = [
+  {
+    id: 'first_quiz',
+    name: 'Premier Quiz',
+    description: 'Complétez votre premier quiz',
+    icon: '🎯',
+    color: '#10b981',
+    requirement: '1 quiz complété',
+    unlocked: false,
+  },
+  {
+    id: 'quiz_apprentice',
+    name: 'Apprenti Quiz',
+    description: 'Complétez 5 quiz',
+    icon: '📚',
+    color: '#3b82f6',
+    requirement: '5 quiz complétés',
+    unlocked: false,
+  },
+  {
+    id: 'quiz_master',
+    name: 'Maître Quiz',
+    description: 'Complétez 10 quiz',
+    icon: '🏆',
+    color: '#f59e0b',
+    requirement: '10 quiz complétés',
+    unlocked: false,
+  },
+  {
+    id: 'perfect_score',
+    name: 'Score Parfait',
+    description: 'Obtenez 100% à un quiz',
+    icon: '⭐',
+    color: '#ef4444',
+    requirement: '100% à un quiz',
+    unlocked: false,
+  },
+  {
+    id: 'week_warrior',
+    name: 'Guerrier de la Semaine',
+    description: 'Maintenez une série de 7 jours',
+    icon: '🔥',
+    color: '#f97316',
+    requirement: 'Série de 7 jours',
+    unlocked: false,
+  },
+  {
+    id: 'hm_explorer',
+    name: 'Explorateur HM',
+    description: 'Complétez tous les chapitres des matières dangereuses',
+    icon: '☢️',
+    color: '#a855f7',
+    requirement: 'Tous les chapitres HM lus',
+    unlocked: false,
+  },
+  {
+    id: 'hm_flashcards_master',
+    name: 'Maître Flashcards',
+    description: 'Maîtrisez toutes les flashcards HM',
+    icon: '🃏',
+    color: '#8b5cf6',
+    requirement: '9 flashcards maîtrisées',
+    unlocked: false,
+  },
+  {
+    id: 'bookworm',
+    name: 'Bibliophile',
+    description: 'Ajoutez 5 questions en favoris',
+    icon: '📖',
+    color: '#06b6d4',
+    requirement: '5 favoris ajoutés',
+    unlocked: false,
+  },
+  {
+    id: 'collector',
+    name: 'Collectionneur',
+    description: 'Ajoutez 10 questions en favoris',
+    icon: '📦',
+    color: '#7c3aed',
+    requirement: '10 favoris ajoutés',
+    unlocked: false,
+  },
+];
+
 // ==================== LANGUAGE CONTEXT ====================
 type LanguageContextType = {
   language: Language;
@@ -172,6 +267,8 @@ function HomeScreen({ navigation }: any) {
   const [totalQuestions, setTotalQuestions] = useState(QUESTIONS.length);
   const [progress, setProgress] = useState(0);
   const [greeting, setGreeting] = useState('');
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
   const { language } = useLanguage();
 
   useEffect(() => {
@@ -187,6 +284,18 @@ function HomeScreen({ navigation }: any) {
       const answered = await AsyncStorage.getItem('answeredQuestions');
       const total = answered ? JSON.parse(answered).length : 0;
       setProgress(total / totalQuestions);
+      
+      // Load streak data
+      const currentStreak = parseInt(await AsyncStorage.getItem('studyStreak') || '0');
+      const best = parseInt(await AsyncStorage.getItem('bestStreak') || '0');
+      setStreak(currentStreak);
+      setBestStreak(best > currentStreak ? best : currentStreak);
+      
+      // Update best streak if current is higher
+      if (currentStreak > best) {
+        await AsyncStorage.setItem('bestStreak', String(currentStreak));
+        setBestStreak(currentStreak);
+      }
     } catch (e) {}
   };
 
@@ -224,6 +333,48 @@ function HomeScreen({ navigation }: any) {
             {Math.round(progress * totalQuestions)} / {totalQuestions} questions répondues
           </Text>
         </TouchableOpacity>
+      </AnimatedCard>
+
+      {/* Study Streak Card */}
+      <AnimatedCard delay={150}>
+        <View style={styles.streakCard}>
+          <View style={styles.streakHeader}>
+            <Text style={styles.streakTitle}>🔥 Série d'étude</Text>
+            <Text style={[styles.streakCount, { color: streak > 0 ? COLORS.warning : COLORS.textMuted }]}>
+              {streak} jour{streak > 1 ? 's' : ''}
+            </Text>
+          </View>
+          <View style={styles.streakDays}>
+            {[0, 1, 2, 3, 4, 5, 6].map((dayOffset) => {
+              const date = new Date();
+              date.setDate(date.getDate() - (6 - dayOffset));
+              const dayName = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+              const isToday = dayOffset === 6;
+              const isStreak = dayOffset >= (7 - streak) && streak > 0;
+              return (
+                <View key={dayOffset} style={styles.streakDayItem}>
+                  <View style={[
+                    styles.streakDayCircle,
+                    isToday && styles.streakDayToday,
+                    isStreak && styles.streakDayActive,
+                  ]}>
+                    <Text style={[
+                      styles.streakDayText,
+                      (isStreak || isToday) && styles.streakDayTextActive
+                    ]}>
+                      {isToday ? '🔥' : dayName.charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+          {bestStreak > 0 && (
+            <Text style={styles.streakBest}>
+              🏆 Meilleure série: {bestStreak} jour{bestStreak > 1 ? 's' : ''}
+            </Text>
+          )}
+        </View>
       </AnimatedCard>
 
       {/* Quick Actions */}
@@ -933,6 +1084,29 @@ function QuizResultScreen({ route, navigation }: any) {
       const answered = JSON.parse(await AsyncStorage.getItem('answeredQuestions') || '[]');
       const newAnswered = [...new Set([...answered, ...questions.map((q: Question) => q.id)])];
       await AsyncStorage.setItem('answeredQuestions', JSON.stringify(newAnswered));
+
+      // Update study streak (use local date, not UTC)
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const lastStudyDate = await AsyncStorage.getItem('lastStudyDate');
+      const streak = parseInt(await AsyncStorage.getItem('studyStreak') || '0');
+      
+      if (lastStudyDate === today) {
+        // Already studied today, don't increment
+      } else {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+        
+        if (lastStudyDate === yesterdayStr) {
+          // Consecutive day, increment streak
+          await AsyncStorage.setItem('studyStreak', String(streak + 1));
+        } else {
+          // Streak broken, reset to 1
+          await AsyncStorage.setItem('studyStreak', '1');
+        }
+        await AsyncStorage.setItem('lastStudyDate', today);
+      }
     } catch (e) {}
   };
 
@@ -1418,6 +1592,84 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
         </View>
       </AnimatedCard>
 
+      {/* Study History Summary */}
+      <AnimatedCard delay={500}>
+        <View style={styles.hmSummaryCard}>
+          <Text style={styles.hmSummaryTitle}>📋 Historique d'étude</Text>
+          
+          <View style={styles.hmSummaryGrid}>
+            <View style={styles.hmSummaryItem}>
+              <Text style={styles.hmSummaryIcon}>📖</Text>
+              <Text style={[styles.hmSummaryValue, { color: module.color }]}>
+                {progress.chaptersViewed.length}/{totalChapters}
+              </Text>
+              <Text style={styles.hmSummaryLabel}>Chapitres lus</Text>
+            </View>
+            
+            <View style={styles.hmSummaryItem}>
+              <Text style={styles.hmSummaryIcon}>❓</Text>
+              <Text style={[styles.hmSummaryValue, { color: COLORS.warning }]}>
+                {progress.questionsAnswered}
+              </Text>
+              <Text style={styles.hmSummaryLabel}>Questions répondues</Text>
+            </View>
+            
+            <View style={styles.hmSummaryItem}>
+              <Text style={styles.hmSummaryIcon}>✅</Text>
+              <Text style={[styles.hmSummaryValue, { color: COLORS.success }]}>
+                {progress.questionsCorrect}
+              </Text>
+              <Text style={styles.hmSummaryLabel}>Bonnes réponses</Text>
+            </View>
+            
+            <View style={styles.hmSummaryItem}>
+              <Text style={styles.hmSummaryIcon}>📝</Text>
+              <Text style={[styles.hmSummaryValue, { color: COLORS.primary }]}>
+                {progress.quizzesCompleted}
+              </Text>
+              <Text style={styles.hmSummaryLabel}>Quiz effectués</Text>
+            </View>
+          </View>
+          
+          {progress.questionsAnswered > 0 && (
+            <View style={styles.hmSummaryAccuracy}>
+              <Text style={styles.hmSummaryAccuracyLabel}>Taux de réussite</Text>
+              <View style={styles.hmSummaryAccuracyBar}>
+                <ProgressBar 
+                  progress={progress.questionsCorrect / progress.questionsAnswered} 
+                  color={COLORS.success} 
+                  height={8}
+                />
+              </View>
+              <Text style={[styles.hmSummaryAccuracyValue, { 
+                color: (progress.questionsCorrect / progress.questionsAnswered) >= 0.8 ? COLORS.success : COLORS.warning 
+              }]}>
+                {Math.round((progress.questionsCorrect / progress.questionsAnswered) * 100)}%
+              </Text>
+            </View>
+          )}
+          
+          <View style={styles.hmSummaryTimeline}>
+            <Text style={styles.hmSummaryTimelineTitle}>Progression par chapitre</Text>
+            {module.chapters.map((chapter, index) => {
+              const isViewed = progress.chaptersViewed.includes(index);
+              return (
+                <View key={chapter.id} style={styles.hmSummaryTimelineItem}>
+                  <View style={styles.hmSummaryTimelineDot}>
+                    <Text style={[styles.hmSummaryTimelineDotText, { color: isViewed ? COLORS.success : COLORS.textMuted }]}>
+                      {isViewed ? '✓' : '○'}
+                    </Text>
+                  </View>
+                  <Text style={[styles.hmSummaryTimelineText, isViewed && styles.hmSummaryTimelineTextCompleted]}>
+                    {chapter.title}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      </AnimatedCard>
+
       <View style={{ height: 100 }} />
     </ScrollView>
   );
@@ -1431,6 +1683,26 @@ function FlashcardsScreen({ navigation }: any) {
   const [masteredCards, setMasteredCards] = useState<number[]>([]);
   const flipAnim = useRef(new Animated.Value(0)).current;
   const { isTablet, isLargeTablet, width } = useResponsive();
+
+  // Load mastered cards from AsyncStorage on mount
+  useEffect(() => {
+    loadMasteredCards();
+  }, []);
+
+  const loadMasteredCards = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('masteredFlashcards');
+      if (saved) {
+        setMasteredCards(JSON.parse(saved));
+      }
+    } catch (e) {}
+  };
+
+  const saveMasteredCards = async (cards: number[]) => {
+    try {
+      await AsyncStorage.setItem('masteredFlashcards', JSON.stringify(cards));
+    } catch (e) {}
+  };
   const flashcardWidth = isLargeTablet ? width * 0.5 : isTablet ? width * 0.65 : width * 0.85;
   const flashcardHeight = isLargeTablet ? 420 : isTablet ? 380 : 340;
 
@@ -1559,11 +1831,14 @@ function FlashcardsScreen({ navigation }: any) {
   };
 
   const toggleMastered = () => {
+    let newMastered: number[];
     if (masteredCards.includes(currentIndex)) {
-      setMasteredCards(masteredCards.filter(i => i !== currentIndex));
+      newMastered = masteredCards.filter(i => i !== currentIndex);
     } else {
-      setMasteredCards([...masteredCards, currentIndex]);
+      newMastered = [...masteredCards, currentIndex];
     }
+    setMasteredCards(newMastered);
+    saveMasteredCards(newMastered);
   };
 
   const progress = masteredCards.length / flashcards.length;
@@ -1573,9 +1848,9 @@ function FlashcardsScreen({ navigation }: any) {
       {/* Header */}
       <View style={styles.flashcardHeader}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.flashcardBackBtn}>
-          <Text style={styles.flashcardBackText}>← Retour</Text>
+          <Text style={styles.flashcardBackText}>← {t('common.back', language)}</Text>
         </TouchableOpacity>
-        <Text style={styles.flashcardTitle}>🃏 Flashcards</Text>
+        <Text style={styles.flashcardTitle}>🃏 {t('flashcards.title', language)}</Text>
         <Text style={styles.flashcardProgress}>
           {currentIndex + 1}/{flashcards.length}
         </Text>
@@ -1585,7 +1860,7 @@ function FlashcardsScreen({ navigation }: any) {
       <View style={styles.flashcardProgressBar}>
         <ProgressBar progress={progress} color={COLORS.success} height={8} />
         <Text style={styles.flashcardMasteredText}>
-          {masteredCards.length}/{flashcards.length} maîtrisées
+          {masteredCards.length}/{flashcards.length} {t('flashcards.mastered', language)}
         </Text>
       </View>
 
@@ -1615,7 +1890,7 @@ function FlashcardsScreen({ navigation }: any) {
             <Text style={styles.flashcardName}>
               {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
             </Text>
-            <Text style={styles.flashcardHint}>Appuyez pour retourner</Text>
+            <Text style={styles.flashcardHint}>{t('flashcards.tapToFlip', language)}</Text>
           </Animated.View>
 
           {/* Back of card */}
@@ -1656,7 +1931,7 @@ function FlashcardsScreen({ navigation }: any) {
           style={[styles.flashcardNavBtn, styles.flashcardNavBtnPrev]}
           onPress={prevCard}
         >
-          <Text style={styles.flashcardNavBtnText}>← Précédent</Text>
+          <Text style={styles.flashcardNavBtnText}>{t('flashcards.previous', language)}</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -1666,7 +1941,7 @@ function FlashcardsScreen({ navigation }: any) {
           onPress={toggleMastered}
         >
           <Text style={styles.flashcardNavBtnText}>
-            {masteredCards.includes(currentIndex) ? '✅ Maîtrisé' : '☐ Marquer'}
+            {masteredCards.includes(currentIndex) ? t('flashcards.masteredBadge', language) : t('flashcards.markMastered', language)}
           </Text>
         </TouchableOpacity>
         
@@ -1674,7 +1949,7 @@ function FlashcardsScreen({ navigation }: any) {
           style={[styles.flashcardNavBtn, styles.flashcardNavBtnNext]}
           onPress={nextCard}
         >
-          <Text style={styles.flashcardNavBtnText}>Suivant →</Text>
+          <Text style={styles.flashcardNavBtnText}>{t('flashcards.next', language)}</Text>
         </TouchableOpacity>
       </View>
 
@@ -1994,6 +2269,73 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textLight,
     marginTop: 8,
+  },
+
+  // Study Streak
+  streakCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  streakHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  streakTitle: {
+    fontSize: 16,
+    ...FONTS.semibold,
+    color: COLORS.text,
+  },
+  streakCount: {
+    fontSize: 24,
+    ...FONTS.bold,
+  },
+  streakDays: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  streakDayItem: {
+    alignItems: 'center',
+  },
+  streakDayCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  streakDayToday: {
+    borderWidth: 2,
+    borderColor: COLORS.warning,
+  },
+  streakDayActive: {
+    backgroundColor: COLORS.warning + '20',
+  },
+  streakDayText: {
+    fontSize: 12,
+    ...FONTS.medium,
+    color: COLORS.textMuted,
+  },
+  streakDayTextActive: {
+    color: COLORS.warning,
+    ...FONTS.semibold,
+  },
+  streakBest: {
+    fontSize: 13,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    marginTop: 4,
   },
 
   // Quick Actions

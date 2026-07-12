@@ -1911,7 +1911,7 @@ CONDUITE DE NUIT:
         keyPoints: [
           'Tableaux orange AVANT et ARRIÈRE obligatoires',
           'Numéro ONU à 4 chiffres sur les tableaux',
-          'Feux orange clignotants en cas d'arrêt prolongé',
+          'Feux orange clignotants en cas d\'arrêt prolongé',
           'Ne jamais toucher au chargement en cas d\'accident'
         ],
         keyPointsAr: [
