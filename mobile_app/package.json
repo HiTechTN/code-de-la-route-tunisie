@@ -1,6 +1,6 @@
 {
   "name": "code-de-la-route-tunisie",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Application mobile complète pour préparer l'examen du code de la route en Tunisie. 130+ questions, 6 modules de cours, quiz et mode examen.",
   "main": "index.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "type": "git",
     "url": "https://github.com/HiTechTN/code-de-la-route-tunisie.git"
   },
-  "homepage": "https://github.com/HiTechTN/code-de-la-route-tunisie#readme",
+  "homepage": "https://hitechtn.github.io/code-de-la-route-tunisie",
   "bugs": {
     "url": "https://github.com/HiTechTN/code-de-la-route-tunisie/issues"
   },

@@ -6,6 +6,7 @@ on:
     tags: [ 'v*' ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,9 +18,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-          cache-dependency-path: mobile_app/package.json
+          cache-dependency-path: mobile_app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: mobile_app
+        run: npm install
 
       - name: Setup Expo CLI
         run: npm install -g eas-cli
@@ -30,19 +35,14 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install dependencies
-        run: cd mobile_app && npm install
-
       - name: Build Web App
         working-directory: mobile_app
-        run: npm run build:web
+        run: npx expo export -p web
 
       - name: Package Web App
         working-directory: mobile_app
         run: |
-          mkdir -p web-build
-          cp -r dist/* web-build/
-          cd web-build && zip -r ../web-app.zip .
+          cd dist && zip -r ../web-app.zip .
 
       - name: Upload Web App artifact
         uses: actions/upload-artifact@v4
@@ -51,15 +51,37 @@ jobs:
           path: mobile_app/web-app.zip
           retention-days: 90
 
-      - name: Build Android APK
+      - name: Build Android APK via EAS
         working-directory: mobile_app
-        run: eas build --platform android --profile preview --non-interactive
+        run: |
+          BUILD_OUTPUT=$(eas build --platform android --profile preview --non-interactive 2>&1)
+          echo "$BUILD_OUTPUT"
+          # Extract build ID from output
+          BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build ID:\s*\K[a-f0-9]+' || true)
+          if [ -z "$BUILD_ID" ]; then
+            BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'id:\s*\K[a-f0-9]+' | head -1 || true)
+          fi
+          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+
+      - name: Wait for EAS build
+        working-directory: mobile_app
+        run: |
+          if [ -n "$BUILD_ID" ]; then
+            echo "Waiting for build $BUILD_ID to complete..."
+            eas build:view $BUILD_ID --json
+            # Download the APK
+            eas build:download --id $BUILD_ID --path ./app-release.apk
+          else
+            echo "No build ID found, attempting to download latest..."
+            eas build:list --platform android --limit 1 --json
+          fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: mobile_app/*.apk
+          path: mobile_app/app-release.apk
+          if-no-files-found: warn
           retention-days: 90
 
   release:
@@ -74,12 +96,16 @@ jobs:
         with:
           name: android-apk
           path: ./release
+        continue-on-error: true
 
       - name: Download Web App artifact
         uses: actions/download-artifact@v4
         with:
           name: web-app
           path: ./release
+
+      - name: List release files
+        run: ls -la ./release/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
