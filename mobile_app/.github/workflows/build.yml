@@ -36,11 +36,29 @@ jobs:
         working-directory: mobile_app
         run: eas build --platform android --profile preview --non-interactive
 
+      - name: Build Web App
+        working-directory: mobile_app
+        run: npm run build:web
+
+      - name: Package Web App
+        working-directory: mobile_app
+        run: |
+          mkdir -p web-build
+          cp -r dist/* web-build/
+          cd web-build && zip -r ../web-app.zip .
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: mobile_app/*.apk
+          retention-days: 90
+
+      - name: Upload Web App artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-app
+          path: mobile_app/web-app.zip
           retention-days: 90
 
   release:
@@ -56,10 +74,16 @@ jobs:
           name: android-apk
           path: ./release
 
+      - name: Download Web App artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-app
+          path: ./release
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./release/*.apk
+          files: ./release/*
           generate_release_notes: true
           draft: false
           prerelease: false
