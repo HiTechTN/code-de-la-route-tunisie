@@ -29,6 +29,7 @@ export const CATEGORIES = [
   { id: 'reglement', name: 'Règlement', nameAr: 'النظام', icon: '📋', color: '#8e44ad' },
   { id: 'panneaux', name: 'Panneaux', nameAr: 'اللافتات', icon: '🪧', color: '#d35400' },
   { id: 'techniques', name: 'Techniques', nameAr: 'التقنيات', icon: '⚙️', color: '#7f8c8d' },
+  { id: 'matieres_dangereuses', name: 'Matières Dangereuses', nameAr: 'المواد الخطرة', icon: '☣️', color: '#ff6b35' },
 ];
 
 export const QUESTIONS: Question[] = [
@@ -1750,6 +1751,138 @@ export const QUESTIONS: Question[] = [
     explanation: "Tenez le volant à 9h-3h ou 10h-2h pour un contrôle optimal.",
     explanationAr: "أمسك المقود عند الساعة 9-3 أو 10-2 للحصول على أفضل تحكم.",
     difficulty: 'facile'
+  },
+
+  // ==================== MATIERES DANGEREUSES ====================
+  {
+    id: 131,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Combien de classes de matières dangereuses existent selon l'ONU?",
+    questionAr: "كم عدد فئات المواد الخطرة حسب منظمة الأمم المتحدة؟",
+    options: ["5 classes", "7 classes", "9 classes", "12 classes"],
+    optionsAr: ["5 فئات", "7 فئات", "9 فئات", "12 فئة"],
+    correctAnswer: 2,
+    explanation: "Il existe 9 classes de matières dangereuses: Explosifs, Gaz, Liquides inflammables, Solides inflammables, Oxydants, Substances toxiques, Radioactives, Corrosifs, Dangers divers.",
+    explanationAr: "توجد 9 فئات من المواد الخطرة: المتفجرات، الغازات، السوائل القابلة للاشتعال، الصلبات القابلة للاشتعال، المؤكسدة، المواد السامة، المواد المشعة، المواد المcorrosive، المخاطر المتنوعة.",
+    difficulty: 'facile'
+  },
+  {
+    id: 132,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "La classe 1 des matières dangereuses correspond aux:",
+    questionAr: "الفئة الأولى من المواد الخطرة تقابل:",
+    options: ["Gaz comprimés", "Liquides inflammables", "Explosifs", "Substances toxiques"],
+    optionsAr: ["الغازات المضغوطة", "السوائل القابلة للاشتعال", "المتفجرات", "المواد السامة"],
+    correctAnswer: 2,
+    explanation: "La classe 1 est celle des EXPLOSIFS (munitions, feux d'artifice, dynamite).",
+    explanationAr: "الفئة الأولى هي المتفجرات (الذخيرة، الألعاب النارية، الديناميت).",
+    difficulty: 'facile'
+  },
+  {
+    id: 133,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Les panneaux de signalisation pour les véhicules transportant des matières dangereuses sont:",
+    questionAr: "لافتات الإشارة للمركبات الناقلة للمواد الخطرة هي:",
+    options: ["Blanches avec bordure rouge", "Oranges avec chiffre noir", "Bleues avec pictogramme", "Vertes avec numéro"],
+    optionsAr: ["بيضاء محاطة بالأحمر", "برتقالية برقم أسود", "زرقاء مع رسم", "خضراء مع رقم"],
+    correctAnswer: 1,
+    explanation: "Les véhicules transportant des MD doivent avoir des tableaux orange avec le numéro d'identification du danger.",
+    explanationAr: "المركبات الناقلة للمواد الخطرة يجب أن تحمل ألواح برتقالية مع رقم تعريف الخطر.",
+    difficulty: 'facile'
+  },
+  {
+    id: 134,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "La classe 3 des matières dangereuses concerne:",
+    questionAr: "الفئة الثالثة من المواد الخطرة تتعلق بـ:",
+    options: ["Gaz comprimés", "Liquides inflammables", "Substances radioactives", "Corrosifs"],
+    optionsAr: ["الغازات المضغوطة", "السوائل القابلة للاشتعال", "المواد المشعة", "المواد المcorrosive"],
+    correctAnswer: 1,
+    explanation: "La classe 3 concerne les LIQUIDES INFLAMMABLES (essence, alcool, kérosène) avec un point éclair < 61°C.",
+    explanationAr: "الفئة الثالثة تتعلق بالسوائل القابلة للاشتعال (البنزين، الكحول، الكيروسين) بنقطة وميض أقل من 61 درجة.",
+    difficulty: 'moyen'
+  },
+  {
+    id: 135,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Quel document est obligatoire pour chaque chargement de matières dangereuses?",
+    questionAr: "أي وثيقة إلزامية لكل شحنة من المواد الخطرة؟",
+    options: ["La carte grise du véhicule", "La fiche d'identification des risques", "Le permis de conduire", "L'attestation d'assurance"],
+    optionsAr: ["البطاقة الرمادية للمركبة", "بطاقة تعريف المخاطر", "رخصة القيادة", "شهادة التأمين"],
+    correctAnswer: 1,
+    explanation: "La fiche d'identification des risques est obligatoire pour chaque chargement de MD et contient le numéro ONU.",
+    explanationAr: "بطاقة تعريف المخاطر إلزامية لكل شحنة من المواد الخطرة وتحتوي على رقم الأونو.",
+    difficulty: 'moyen'
+  },
+  {
+    id: 136,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Les feux orange clignotants sur un véhicule transportant des MD doivent être:",
+    questionAr: "الأضواء البرتقالية الوامعة على المركبة الناقلة للمواد الخطرة يجب أن تكون:",
+    options: ["Allumés uniquement la nuit", "Allumés de jour comme de nuit", "Allumés uniquement en cas d'arrêt", "Interdits"],
+    optionsAr: ["مضاءة فقط ليلاً", "مضاءة نهاراً وليلاً", "مضاءة فقط عند التوقف", "محرّمة"],
+    correctAnswer: 1,
+    explanation: "Les feux orange clignotants doivent être activés de jour comme de nuit pour signaler la présence de matières dangereuses.",
+    explanationAr: "الأضواء البرتقالية الوامعة يجب تفعيلها نهاراً وليلاً للإشارة إلى وجود مواد خطرة.",
+    difficulty: 'moyen'
+  },
+  {
+    id: 137,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Quelle est la classe des matières dangereuses pour les gaz comprimés?",
+    questionAr: "ما هي فئة المواد الخطرة للغازات المضغوطة؟",
+    options: ["Classe 1", "Classe 2", "Classe 3", "Classe 4"],
+    optionsAr: ["الفئة 1", "الفئة 2", "الفئة 3", "الفئة 4"],
+    correctAnswer: 1,
+    explanation: "La classe 2 concerne les GAZ (comprimés, liquéfiés, dissous) comme le propane, l'oxygène, l'hydrogène.",
+    explanationAr: "الفئة 2 تتعلق بالغازات (المضغوطة، المسيولة، المحلولة) مثل البروبان والأكسجين والهيدروجين.",
+    difficulty: 'facile'
+  },
+  {
+    id: 138,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "En cas d'accident avec un véhicule transportant des MD, il faut:",
+    questionAr: "في حالة حادث مع مركبة ناقلة للمواد الخطرة، يجب:",
+    options: ["Approcher pour aider", "S'éloigner et alerter les secours sans toucher au chargement", "Prendre des photos", "Continuer sa route"],
+    optionsAr: ["الاقتراب للمساعدة", "الابتعاد والإنذار دون لمس الشحنة", "التقاط صور", "إكمال الطريق"],
+    correctAnswer: 1,
+    explanation: "En cas d'accident avec des MD, éloignez-vous, n'approchez pas le chargement et appelez immédiatement les secours (198 pompiers).",
+    explanationAr: "في حالة حادث مع مواد خطرة، ابتعد، لا تقترب من الشحنة واتصل فوراً بالإطفاء (198).",
+    difficulty: 'facile'
+  },
+  {
+    id: 139,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Le numéro ONU sur les tableaux d'identification:",
+    questionAr: "رقم الأونو على لوحات التعريف:",
+    options: ["Est optionnel", "Identifie la matière dangereuse transportée", "Indique le poids du chargement", "Donne le numéro du conducteur"],
+    optionsAr: ["اختياري", "يحدد المادة الخطرة المنقولة", "يدل على وزن الشحنة", "يعطي رقم السائق"],
+    correctAnswer: 1,
+    explanation: "Le numéro ONU (4 chiffres) identifie la nature de la matière dangereuse transportée.",
+    explanationAr: "رقم الأونو (4 أرقام) يحدد طبيعة المادة الخطرة المنقولة.",
+    difficulty: 'facile'
+  },
+  {
+    id: 140,
+    category: 'matieres_dangereuses',
+    categoryAr: 'المواد الخطرة',
+    question: "Quel permis de conduire est nécessaire pour transporter des matières dangereuses?",
+    questionAr: "أي رخصة قيادة ضرورية لنقل المواد الخطرة؟",
+    options: ["Catégorie B uniquement", "Catégorie C, D ou E", "Aucun permis spécial", "Catégorie A"],
+    optionsAr: ["الفئة B فقط", "الفئة C أو D أو E", "لا حاجة لرخصة خاصة", "الفئة A"],
+    correctAnswer: 1,
+    explanation: "Le transport de MD nécessite un permis spécialisé (catégorie C pour poids lourds, D pour bus, E pour articulés).",
+    explanationAr: "نقل المواد الخطرة يتطلب رخصة متخصصة (الفئة C للشاحنات الثقيلة، D للحافلات، E للمركبات الموصولة).",
+    difficulty: 'moyen'
   },
 ];
 
