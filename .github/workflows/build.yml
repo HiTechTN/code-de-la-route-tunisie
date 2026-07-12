@@ -33,10 +33,6 @@ jobs:
       - name: Install dependencies
         run: cd mobile_app && npm install
 
-      - name: Build Android APK
-        working-directory: mobile_app
-        run: eas build --platform android --profile preview --non-interactive
-
       - name: Build Web App
         working-directory: mobile_app
         run: npm run build:web
@@ -48,18 +44,22 @@ jobs:
           cp -r dist/* web-build/
           cd web-build && zip -r ../web-app.zip .
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: mobile_app/*.apk
-          retention-days: 90
-
       - name: Upload Web App artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-app
           path: mobile_app/web-app.zip
+          retention-days: 90
+
+      - name: Build Android APK
+        working-directory: mobile_app
+        run: eas build --platform android --profile preview --non-interactive
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: mobile_app/*.apk
           retention-days: 90
 
   release:
