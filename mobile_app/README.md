@@ -1,226 +1,222 @@
-# 🚗 Code de la Route Tunisie
+<p align="center">
+  <img src="https://img.shields.io/badge/Code_de_la_Route-Tunisie-success?style=for-the-badge" alt="Code de la Route Tunisie"/>
+  <br/>
+  <img src="https://img.shields.io/badge/React_Native-Expo-blue?style=for-the-badge&logo=react" alt="React Native Expo"/>
+  <img src="https://img.shields.io/badge/Web-React_Native_Web-61dafb?style=for-the-badge&logo=react" alt="Web App"/>
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License"/>
+</p>
 
-Application mobile complète pour préparer l'examen du code de la route en Tunisie.
+<h1 align="center">🚗 Code de la Route Tunisie</h1>
+<h3 align="center">🇫🇷 Application mobile complète pour l'examen du permis de conduire</h3>
+<h3 align="center">🇹🇳 تطبيق موبايل كامل لامتحان رخصة السياقة</h3>
 
-## 📱 Fonctionnalités
+---
 
-### 🏠 Page d'Accueil
-- Tableau de bord avec progression
-- Accès rapides aux fonctionnalités principales
-- Astuces du jour
+<p align="center">
+  <a href="#fonctionnalités">Fonctionnalités</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#web-app">Web App</a> •
+  <a href="#technologies">Technologies</a> •
+  <a href="#contributeurs">Contribuer</a>
+</p>
 
-### 📚 Module Cours (6 modules complets)
-1. **Règles de Circulation** - Code de la route, vitesses, panneaux
-2. **Signalisation** - Panneaux danger, interdiction, obligation
-3. **La Priorité** - Règles de priorité, carrefours, giratoires
-4. **Sécurité Routière** - Équipements, distances de sécurité
-5. **Alcool & Drogues** - Seuils légaux, sanctions, conduite sous influence
-6. **Secourisme** - Premiers secours, numéros d'urgence
+---
 
-### ❓ Quiz d'Entraînement
-- **Mode Libre** : 5-30 questions, difficulté variable
-- **Par Catégorie** : 12 catégories disponibles
-- **Mode Examen** : 30 questions, chronomètre 30 minutes
+## 📊 Chiffres Clés | أرقام رئيسية
 
-### 📊 Statistiques
-- Suivi des progrès
-- Scores moyens
-- Progression par catégorie
+| Élément | Quantité | العنصر | الكمية |
+|---------|----------|---------|--------|
+| ❓ Questions | 130+ | أسئلة | 130+ |
+| 📚 Catégories | 12 | فئات | 12 |
+| 📖 Modules de cours | 6 | وحدات تعليمية | 6 |
+| 🌍 Langues | 2 (FR/AR) | لغات | 2 (فر/عر) |
+| ⭐ Note de passage | 24/30 (80%) | درجة النجاح | 24/30 (80%) |
 
-## 🌍 Langues
-- 🇫🇷 Français
-- 🇹🇳 Arabe (Tunisien)
+---
 
-## 🛠️ Installation
+## 🎯 Modes de Quiz | أنماط الاختبار
 
-### Prérequis
+### 🏠 Entraînement Libre | تدريب حر
+- Choisissez 5 à 30 questions | اختر من 5 إلى 30 سؤالاً
+- Difficulté variable | صعوبة متغيرة
+- Progression sauvegardée | حفظ التقدم
+
+### 📂 Par Catégorie | حسب الفئة
+- 12 catégories spécialisées | 12 فئة متخصصة
+- Révision ciblée | مراجعة موجهة
+- Feedback immédiat | رد فوري
+
+### 🎓 Mode Examen | وضع الامتحان
+- 30 questions aléatoires | 30 سؤالاً عشوائياً
+- Chronomètre 30 min | مؤقت 30 دقيقة
+- Simulation réelle | محاكاة حقيقية
+
+---
+
+## 📚 Modules de Cours | وحدات تعليمية
+
+| # | Module | الوحدة |
+|---|--------|--------|
+| 1 | 🚦 Règles de Circulation | قواعد المرور |
+| 2 | 🚸 Signalisation | الإشارات |
+| 3 | ⚖️ La Priorité | الأولوية |
+| 4 | 🛡️ Sécurité Routière | السلامة الطرقية |
+| 5 | 🍺 Alcool & Drogues | الكحول والمخدرات |
+| 6 | 🏥 Secourisme | الإسعافات الأولية |
+
+---
+
+## 🌍 Langues Disponibles | اللغات المتاحة
+
+| Langue | langue | Status |
+|--------|--------|--------|
+| 🇫🇷 Français | الفرنسية | ✅ |
+| 🇹🇳 Arabe (Tunisien) | العربية (تونسية) | ✅ |
+
+---
+
+## 🛠️ Installation | التثبيت
+
+### 📱 Mobile App
+
+#### Prérequis | المتطلبات
 - Node.js 18+
 - npm ou yarn
 - Expo CLI
 
-### Développement
-
+#### Développement | التطوير
 ```bash
-# Cloner le repository
+# Cloner le repository | استنساخ المستودع
 git clone https://github.com/HiTechTN/code-de-la-route-tunisie.git
 cd code-de-la-route-tunisie
 
-# Installer les dépendances
+# Installer les dépendances | تثبيت التبعيات
 npm install
 
-# Lancer l'application
+# Lancer l'application | تشغيل التطبيق
 npx expo start
 ```
 
-### Build APK (Android)
-
+#### Build APK
 ```bash
-# Installer EAS CLI
 npm install -g eas-cli
-
-# Se connecter à Expo
 eas login
-
-# Configurer le build
 eas build:configure
-
-# Builder l'APK
 eas build --platform android --profile preview
 ```
 
-### Build via GitHub Actions
-Le build est automatique via GitHub Actions. Consultez la section CI/CD.
+---
 
-## 🌐 Version Web-App
+## 🌐 Web App | التطبيق الويب
 
-L'application est également disponible en version web, accessible directement depuis votre navigateur.
+### 🚀 Accès Rapide | وصول سريع
 
-### Prérequis
+<p align="center">
+  <a href="https://HiTechTN.github.io/code-de-la-route-tunisie">
+    <img src="https://img.shields.io/badge/🌐_Web_App-Live-success?style=for-the-badge" alt="Web App Live"/>
+  </a>
+</p>
 
-- Node.js 18+
-- npm
+**GitHub Pages :** [https://HiTechTN.github.io/code-de-la-route-tunisie](https://HiTechTN.github.io/code-de-la-route-tunisie)
 
-### Accéder à la Web-App
+### 🛠️ Installation Web
 
-**En ligne (GitHub Pages) :**
-> 🔗 [https://HiTechTN.github.io/code-de-la-route-tunisie](https://HiTechTN.github.io/code-de-la-route-tunisie)
-
-**En local :**
 ```bash
-# Installer les dépendances web (une seule fois)
+# Installer les dépendances web (une seule fois) | تثبيت تبعيات الويب (مرة واحدة)
 npm install react-dom react-native-web @expo/metro-runtime
 
-# Lancer le serveur de développement web
+# Lancer le serveur de développement | تشغيل خادم التطوير
 npm run start:web
 ```
 
-> ⚠️ **Note :** L'installation des dépendances web est une opération unique. Elle n'est pas nécessaire à chaque clone du repository car les dépendances sont déjà définies dans `package.json`.
+> ⚠️ **Note :** L'installation des dépendances web est unique. Elle n'est pas nécessaire à chaque clone.
 
-L'app s'ouvrira sur `http://localhost:19006` (ou un port similaire).
-
-### Build de l'Application Web
-
+### 📦 Build Web
 ```bash
-# Compiler l'app web pour la production
 npm run build:web
-
-# Le résultat sera dans le dossier dist/
 ```
 
-### Déploiement Automatique
+### 🚀 Déploiement Automatique
+Le déploiement vers GitHub Pages est automatique via GitHub Actions à chaque push sur `main`.
 
-Le déploiement vers GitHub Pages est automatique via GitHub Actions :
-- 📦 Le workflow se déclenche à chaque push sur `main`
-- 🏗️ L'app est compilée avec Expo pour le web
-- 🚀 Le résultat est déployé sur GitHub Pages
+---
 
-### Configuration GitHub Pages
+## 🏗️ Technologies | التقنيات
 
-Pour activer GitHub Pages :
-1. Aller dans **Settings** → **Pages**
-2. Sous **Source**, sélectionner **GitHub Actions**
-3. Le prochain push déclenchera le déploiement automatique
+| Technologie | Technologie | Usage |
+|-------------|-------------|-------|
+| React Native | React Native | Framework mobile |
+| Expo | إيكسبو | Plateforme de développement |
+| React Native Web | React Native Web | Support web |
+| Metro Bundler | Metro Bundler | Bundler JavaScript |
+| GitHub Actions | GitHub Actions | CI/CD automatique |
+| GitHub Pages | GitHub Pages | Hébergement web |
 
-### Technologies Web
+---
 
-| Technologie | Rôle |
-|-------------|------|
-| React Native for Web | Compatibilité web de React Native |
-| Metro Bundler | Bundler JavaScript optimisé |
-| GitHub Actions | CI/CD automatique |
-| GitHub Pages | Hébergement statique gratuit |
-
-## 📁 Structure du Projet
+## 📁 Structure du Projet | هيكل المشروع
 
 ```
-mobile_app/
-├── App.tsx                    # Application principale (2196 lignes)
+├── App.tsx                    # Application principale
 ├── data/
-│   ├── questions.ts           # 130+ questions avec traductions
-│   └── courses.ts             # 6 modules de cours
+│   ├── questions.ts           # 130+ questions
+│   ├── courses.ts             # 6 modules de cours
+│   ├── translations.ts        # Traductions FR/AR
+│   └── image_mapping.json     # Mapping images quiz
 ├── assets/
 │   ├── icon.png               # Icône de l'app
 │   ├── adaptive-icon.png      # Icône Android
 │   ├── splash.png             # Écran de démarrage
-│   └── favicon.png            # Favicon web
+│   ├── favicon.png            # Favicon web
+│   └── extracted_images/      # Images du quiz
+├── .github/workflows/
+│   └── deploy-web.yml         # Déploiement GitHub Pages
 ├── app.json                   # Configuration Expo
 ├── eas.json                   # Configuration EAS Build
-├── tsconfig.json              # Configuration TypeScript
-├── babel.config.js            # Configuration Babel
 ├── package.json               # Dépendances
-└── .gitignore                 # Fichiers ignorés
+└── README.md                  # Documentation
 ```
-
-## 📊 Contenu
-
-| Élément | Quantité |
-|---------|----------|
-| Questions | 130+ |
-| Catégories | 12 |
-| Modules de cours | 6 |
-| Chapitres | 30+ |
-| Langues | 2 (FR/AR) |
-
-## 🎯 Modes de Quiz
-
-### Entraînement Libre
-- Choisissez le nombre de questions (5, 10, 15, 20, 30)
-- Sélectionnez la difficulté (Toutes, Facile, Moyen, Difficile)
-- Entraînez-vous à votre rythme
-
-### Par Catégorie
-- 12 catégories disponibles
-- Questions ciblées par sujet
-- Idéal pour réviser un point précis
-
-### Mode Examen
-- 30 questions aléatoires
-- Chronomètre de 30 minutes
-- Score minimum requis : 24/30 (80%)
-- Simulation de l'examen réel
-
-## 🏷️ Catégories
-
-1. 🚦 Signalisation
-2. ⚖️ Priorité
-3. 🏎️ Vitesse
-4. 🅿️ Stationnement
-5. 🛡️ Sécurité
-6. 🍺 Alcool
-7. 🏥 Secourisme
-8. 🔧 Mécanique
-9. 🌿 Écologie
-10. 📋 Règlement
-11. 🪧 Panneaux
-12. 🔧 Techniques
-
-## 🛠️ Technologies
-
-- **Framework** : React Native (Expo)
-- **Navigation** : React Navigation
-- **Stockage** : AsyncStorage
-- **Build** : EAS Build
-- **CI/CD** : GitHub Actions
-
-
-
-## 📄 Licence
-
-MIT License - Voir le fichier LICENSE pour plus de détails.
-
-## 🤝 Contribuer
-
-Les contributions sont bienvenues ! N'hésitez pas à :
-- Signaler des bugs
-- Proposer de nouvelles fonctionnalités
-- Améliorer la documentation
-- Traduire dans d'autres langues
-
-## 📞 Support
-
-Pour toute question ou problème, ouvrez une issue sur GitHub.
 
 ---
 
-**🇹🇳 Préparez-vous pour votre permis de conduire avec confiance !**
+## 📈 Statistiques | إحصائيات
 
+![GitHub stars](https://img.shields.io/github/stars/HiTechTN/code-de-la-route-tunisie?style=social)
+![GitHub forks](https://img.shields.io/github/forks/HiTechTN/code-de-la-route-tunisie?style=social)
+![GitHub issues](https://img.shields.io/github/issues/HiTechTN/code-de-la-route-tunisie)
+![GitHub last commit](https://img.shields.io/github/last-commit/HiTechTN/code-de-la-route-tunisie)
+
+---
+
+## 🤝 Contribuer | المساهمة
+
+Les contributions sont bienvenues ! | المساهمات مرحب بها!
+
+- 🐛 Signaler des bugs | الإبلاغ عن الأخطاء
+- 💡 Proposer des fonctionnalités | اقتراح ميزات
+- 📝 Améliorer la documentation | تحسين الوثائق
+- 🌐 Traduire | الترجمة
+
+---
+
+## 📄 Licence | الرخصة
+
+MIT License - Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+---
+
+## 📞 Support | الدعم
+
+Pour toute question | لأي سؤال:
+- 📧 Ouvrir une issue GitHub | فتح issue على GitHub
+- 💬 Discussion GitHub | مناقشة GitHub
+
+---
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Made_with_❤️-Tunisia-red?style=for-the-badge" alt="Made with Love Tunisia"/>
+  <br/>
+  <strong>🇹🇳 Préparez-vous pour votre permis de conduire avec confiance !</strong>
+  <br/>
+  <strong>🇹🇳 استعد لامتحان رخصة السياقة بثقة !</strong>
+</p>
