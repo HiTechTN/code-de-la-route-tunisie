@@ -1420,6 +1420,19 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
     await saveProgress(newProgress);
   };
 
+  const resetProgress = async () => {
+    try {
+      await AsyncStorage.removeItem('hazardousProgress');
+      setProgress({
+        chaptersViewed: [],
+        questionsAnswered: 0,
+        questionsCorrect: 0,
+        flashcardsMastered: 0,
+        quizzesCompleted: 0,
+      });
+    } catch (e) {}
+  };
+
   if (!module) return <View><Text>Module non trouvé</Text></View>;
 
   const startHazardousQuiz = () => {
@@ -1520,6 +1533,8 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
             <Text style={styles.startQuizBtnSubtext}>Révision rapide</Text>
           </TouchableOpacity>
         </View>
+        
+
       </AnimatedCard>
 
       {/* Course Content */}
