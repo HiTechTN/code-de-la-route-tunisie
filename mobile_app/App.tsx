@@ -1839,6 +1839,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   progressCardTitle: {
     fontSize: 16,
@@ -1870,6 +1871,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   quickActionIcon: {
     fontSize: 32,
@@ -1892,6 +1894,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   sectionTitle: {
     fontSize: 18,
@@ -2053,6 +2056,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginHorizontal: 16,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
     borderLeftWidth: 4,
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
@@ -2125,6 +2129,7 @@ const styles = StyleSheet.create({
   moduleDetailIcon: {
     fontSize: 48,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   moduleDetailTitle: {
     fontSize: 22,
@@ -2138,6 +2143,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginHorizontal: 16,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
     overflow: 'hidden',
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
@@ -2194,6 +2200,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   keyPointsTitle: {
     fontSize: 14,
@@ -2467,6 +2474,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   questionText: {
     fontSize: 17,
@@ -2598,6 +2606,7 @@ const styles = StyleSheet.create({
   resultEmoji: {
     fontSize: 64,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   resultMessage: {
     fontSize: 22,
@@ -2771,6 +2780,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   categoryStatInfo: {
     flexDirection: 'row',
@@ -2867,6 +2877,7 @@ const styles = StyleSheet.create({
   favoritesHeaderIcon: {
     fontSize: 48,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   favoritesHeaderTitle: {
     fontSize: 22,
@@ -2972,6 +2983,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     lineHeight: 20,
     marginBottom: 12,
+    marginHorizontal: "1.5%",
   },
   favoriteQuestionActions: {
     flexDirection: 'row',
