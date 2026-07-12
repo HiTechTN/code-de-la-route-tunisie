@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: mobile_app/package-lock.json
+          cache-dependency-path: mobile_app/package.json
 
       - name: Install dependencies
         working-directory: mobile_app
