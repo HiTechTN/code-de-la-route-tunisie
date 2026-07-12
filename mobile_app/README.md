@@ -71,6 +71,65 @@ eas build --platform android --profile preview
 ### Build via GitHub Actions
 Le build est automatique via GitHub Actions. Consultez la section CI/CD.
 
+## 🌐 Version Web-App
+
+L'application est également disponible en version web, accessible directement depuis votre navigateur.
+
+### Prérequis
+
+- Node.js 18+
+- npm
+
+### Accéder à la Web-App
+
+**En ligne (GitHub Pages) :**
+> 🔗 [https://HiTechTN.github.io/code-de-la-route-tunisie](https://HiTechTN.github.io/code-de-la-route-tunisie)
+
+**En local :**
+```bash
+# Installer les dépendances web (une seule fois)
+npm install react-dom react-native-web @expo/metro-runtime
+
+# Lancer le serveur de développement web
+npm run start:web
+```
+
+> ⚠️ **Note :** L'installation des dépendances web est une opération unique. Elle n'est pas nécessaire à chaque clone du repository car les dépendances sont déjà définies dans `package.json`.
+
+L'app s'ouvrira sur `http://localhost:19006` (ou un port similaire).
+
+### Build de l'Application Web
+
+```bash
+# Compiler l'app web pour la production
+npm run build:web
+
+# Le résultat sera dans le dossier dist/
+```
+
+### Déploiement Automatique
+
+Le déploiement vers GitHub Pages est automatique via GitHub Actions :
+- 📦 Le workflow se déclenche à chaque push sur `main`
+- 🏗️ L'app est compilée avec Expo pour le web
+- 🚀 Le résultat est déployé sur GitHub Pages
+
+### Configuration GitHub Pages
+
+Pour activer GitHub Pages :
+1. Aller dans **Settings** → **Pages**
+2. Sous **Source**, sélectionner **GitHub Actions**
+3. Le prochain push déclenchera le déploiement automatique
+
+### Technologies Web
+
+| Technologie | Rôle |
+|-------------|------|
+| React Native for Web | Compatibilité web de React Native |
+| Metro Bundler | Bundler JavaScript optimisé |
+| GitHub Actions | CI/CD automatique |
+| GitHub Pages | Hébergement statique gratuit |
+
 ## 📁 Structure du Projet
 
 ```
@@ -143,6 +202,8 @@ mobile_app/
 - **Build** : EAS Build
 - **CI/CD** : GitHub Actions
 
+
+
 ## 📄 Licence
 
 MIT License - Voir le fichier LICENSE pour plus de détails.
@@ -162,3 +223,4 @@ Pour toute question ou problème, ouvrez une issue sur GitHub.
 ---
 
 **🇹🇳 Préparez-vous pour votre permis de conduire avec confiance !**
+

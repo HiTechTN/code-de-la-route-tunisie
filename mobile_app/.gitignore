@@ -1,3 +1,29 @@
+# dependencies
+node_modules/
+
+# build
+.expo/
+dist/
+web-build/
+native-
+
+# misc
+.env*.local
+
+# debugging
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+*.swp
+
+# Lock file
 # Dependencies
 node_modules/
 
@@ -49,4 +75,11 @@ Thumbs.db
 
 # EAS
 eas-build-*.json
-package-lock.json
+
+# Utility scripts
+extract_*.py
+analyze_*.py
+
+# Build artifacts
+dist/
+web-build/

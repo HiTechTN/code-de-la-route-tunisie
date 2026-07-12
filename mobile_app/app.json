@@ -28,7 +28,8 @@
       "permissions": []
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro",
+      "favicon": "./assets/icon.png"
     },
     "plugins": [],
     "extra": {
