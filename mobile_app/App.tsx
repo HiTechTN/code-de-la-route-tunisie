@@ -1155,9 +1155,57 @@ function FavoritesScreen({ navigation }: any) {
 function HazardousMaterialsStudyScreen({ navigation }: any) {
   const { language } = useLanguage();
   const [currentChapter, setCurrentChapter] = useState(0);
+  const [progress, setProgress] = useState({
+    chaptersViewed: [] as number[],
+    questionsAnswered: 0,
+    questionsCorrect: 0,
+    flashcardsMastered: 0,
+    quizzesCompleted: 0,
+  });
 
   const module = getModuleById('matieres_dangereuses');
   const questions = getQuestionsByCategory('matieres_dangereuses');
+
+  // Load progress from AsyncStorage
+  useEffect(() => {
+    loadProgress();
+  }, []);
+
+  const loadProgress = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('hazardousProgress');
+      if (saved) {
+        setProgress(JSON.parse(saved));
+      }
+    } catch (e) {}
+  };
+
+  const saveProgress = async (newProgress: typeof progress) => {
+    try {
+      await AsyncStorage.setItem('hazardousProgress', JSON.stringify(newProgress));
+      setProgress(newProgress);
+    } catch (e) {}
+  };
+
+  const markChapterViewed = async (chapterIndex: number) => {
+    if (!progress.chaptersViewed.includes(chapterIndex)) {
+      const newProgress = {
+        ...progress,
+        chaptersViewed: [...progress.chaptersViewed, chapterIndex],
+      };
+      await saveProgress(newProgress);
+    }
+  };
+
+  const updateQuizStats = async (correct: number, total: number) => {
+    const newProgress = {
+      ...progress,
+      questionsAnswered: progress.questionsAnswered + total,
+      questionsCorrect: progress.questionsCorrect + correct,
+      quizzesCompleted: progress.quizzesCompleted + 1,
+    };
+    await saveProgress(newProgress);
+  };
 
   if (!module) return <View><Text>Module non trouvé</Text></View>;
 
@@ -1173,6 +1221,13 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
     });
   };
 
+  // Calculate completion percentage
+  const chaptersCompleted = progress.chaptersViewed.length;
+  const totalChapters = module.chapters.length;
+  const chapterProgress = totalChapters > 0 ? chaptersCompleted / totalChapters : 0;
+  const questionProgress = questions.length > 0 ? progress.questionsAnswered / (questions.length * 3) : 0;
+  const overallProgress = (chapterProgress * 0.4 + questionProgress * 0.4 + (progress.flashcardsMastered / 9) * 0.2);
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
@@ -1185,6 +1240,42 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
           <Text style={styles.moduleDetailSubtitle}>
             {questions.length} questions • {module.chapters.length} chapitres
           </Text>
+        </View>
+      </AnimatedCard>
+
+      {/* Progress Tracker */}
+      <AnimatedCard delay={50}>
+        <View style={styles.progressTrackerCard}>
+          <View style={styles.progressTrackerHeader}>
+            <Text style={styles.progressTrackerTitle}>📊 Votre progression</Text>
+            <Text style={[styles.progressTrackerPercent, { color: overallProgress >= 0.8 ? COLORS.success : COLORS.primary }]}>
+              {Math.round(overallProgress * 100)}%
+            </Text>
+          </View>
+          <ProgressBar progress={overallProgress} color={module.color} height={10} />
+          
+          <View style={styles.progressTrackerStats}>
+            <View style={styles.progressTrackerStatItem}>
+              <Text style={styles.progressTrackerStatIcon}>📖</Text>
+              <Text style={styles.progressTrackerStatValue}>{chaptersCompleted}/{totalChapters}</Text>
+              <Text style={styles.progressTrackerStatLabel}>Chapitres</Text>
+            </View>
+            <View style={styles.progressTrackerStatItem}>
+              <Text style={styles.progressTrackerStatIcon}>❓</Text>
+              <Text style={styles.progressTrackerStatValue}>{progress.questionsAnswered}</Text>
+              <Text style={styles.progressTrackerStatLabel}>Questions</Text>
+            </View>
+            <View style={styles.progressTrackerStatItem}>
+              <Text style={styles.progressTrackerStatIcon}>✅</Text>
+              <Text style={styles.progressTrackerStatValue}>{progress.questionsCorrect}</Text>
+              <Text style={styles.progressTrackerStatLabel}>Correctes</Text>
+            </View>
+            <View style={styles.progressTrackerStatItem}>
+              <Text style={styles.progressTrackerStatIcon}>📝</Text>
+              <Text style={styles.progressTrackerStatValue}>{progress.quizzesCompleted}</Text>
+              <Text style={styles.progressTrackerStatLabel}>Quiz</Text>
+            </View>
+          </View>
         </View>
       </AnimatedCard>
 
@@ -1227,7 +1318,12 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
           <TouchableOpacity 
             key={chapter.id}
             style={[styles.chapterCard, currentChapter === index && styles.chapterCardActive]}
-            onPress={() => setCurrentChapter(currentChapter === index ? -1 : index)}
+            onPress={() => {
+              setCurrentChapter(currentChapter === index ? -1 : index);
+              if (currentChapter !== index) {
+                markChapterViewed(index);
+              }
+            }}
           >
             <View style={styles.chapterHeader}>
               <View style={[styles.chapterNumber, { backgroundColor: module.color + '20' }]}>
@@ -1236,7 +1332,14 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
               <Text style={styles.chapterTitle}>
                 {language === 'ar' ? chapter.titleAr : chapter.title}
               </Text>
-              <Text style={styles.chapterToggle}>{currentChapter === index ? '−' : '+'}</Text>
+              <View style={styles.chapterHeaderRight}>
+                {progress.chaptersViewed.includes(index) && (
+                  <View style={[styles.chapterViewedBadge, { backgroundColor: COLORS.success + '20' }]}>
+                    <Text style={[styles.chapterViewedText, { color: COLORS.success }]}>✓</Text>
+                  </View>
+                )}
+                <Text style={styles.chapterToggle}>{currentChapter === index ? '−' : '+'}</Text>
+              </View>
             </View>
 
             {currentChapter === index && (
@@ -3077,6 +3180,74 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textLight,
     marginTop: 2,
+  },
+
+  // Progress Tracker
+  progressTrackerCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  progressTrackerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  progressTrackerTitle: {
+    fontSize: 16,
+    ...FONTS.semibold,
+    color: COLORS.text,
+  },
+  progressTrackerPercent: {
+    fontSize: 20,
+    ...FONTS.bold,
+  },
+  progressTrackerStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  progressTrackerStatItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  progressTrackerStatIcon: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  progressTrackerStatValue: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: COLORS.text,
+  },
+  progressTrackerStatLabel: {
+    fontSize: 11,
+    color: COLORS.textLight,
+    marginTop: 2,
+  },
+  chapterHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  chapterViewedBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chapterViewedText: {
+    fontSize: 14,
+    ...FONTS.bold,
   },
 
   // Flashcards Screen
