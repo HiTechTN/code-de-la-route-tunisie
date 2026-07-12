@@ -3,6 +3,8 @@ name: Deploy Web App to GitHub Pages
 on:
   push:
     branches: [main]
+    paths:
+      - 'mobile_app/**'
   workflow_dispatch:
 
 permissions:
@@ -26,12 +28,14 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: mobile_app/package-lock.json
 
       - name: Install dependencies
+        working-directory: mobile_app
         run: npm ci
 
       - name: Build web app
+        working-directory: mobile_app
         run: npx expo export -p web
 
       - name: Setup Pages
@@ -40,7 +44,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dist'
+          path: 'mobile_app/dist'
 
   deploy:
     environment:
