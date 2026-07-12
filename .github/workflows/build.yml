@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build & Release
 
 on:
   push:
@@ -22,18 +22,18 @@ jobs:
           cache: 'npm'
           cache-dependency-path: mobile_app/package-lock.json
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install dependencies
         working-directory: mobile_app
         run: npm install
-
-      - name: Setup Expo CLI
-        run: npm install -g eas-cli
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Web App
         working-directory: mobile_app
@@ -41,8 +41,7 @@ jobs:
 
       - name: Package Web App
         working-directory: mobile_app
-        run: |
-          cd dist && zip -r ../web-app.zip .
+        run: cd dist && zip -r ../web-app.zip .
 
       - name: Upload Web App artifact
         uses: actions/upload-artifact@v4
@@ -51,36 +50,30 @@ jobs:
           path: mobile_app/web-app.zip
           retention-days: 90
 
-      - name: Build Android APK via EAS
+      - name: Generate Android native project
         working-directory: mobile_app
-        run: |
-          BUILD_OUTPUT=$(eas build --platform android --profile preview --non-interactive 2>&1)
-          echo "$BUILD_OUTPUT"
-          # Extract build ID from output
-          BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build ID:\s*\K[a-f0-9]+' || true)
-          if [ -z "$BUILD_ID" ]; then
-            BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'id:\s*\K[a-f0-9]+' | head -1 || true)
-          fi
-          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+        run: npx expo prebuild --platform android --clean
 
-      - name: Wait for EAS build
-        working-directory: mobile_app
+      - name: Build Android APK
+        working-directory: mobile_app/android
+        run: ./gradlew assembleRelease
+
+      - name: Rename APK
+        working-directory: mobile_app/android/app/build/outputs/apk/release
+        run: cp app-release.apk ../../../web-app.zip 2>/dev/null || cp app-release.apk ../../../../code-de-la-route-tunisie-v${GITHUB_REF_NAME#v}.apk 2>/dev/null || true
+
+      - name: Copy APK to workspace
         run: |
-          if [ -n "$BUILD_ID" ]; then
-            echo "Waiting for build $BUILD_ID to complete..."
-            eas build:view $BUILD_ID --json
-            # Download the APK
-            eas build:download --id $BUILD_ID --path ./app-release.apk
-          else
-            echo "No build ID found, attempting to download latest..."
-            eas build:list --platform android --limit 1 --json
+          APK_SRC="mobile_app/android/app/build/outputs/apk/release/app-release.apk"
+          if [ -f "$APK_SRC" ]; then
+            cp "$APK_SRC" mobile_app/code-de-la-route-tunisie.apk
           fi
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: mobile_app/app-release.apk
+          path: mobile_app/code-de-la-route-tunisie.apk
           if-no-files-found: warn
           retention-days: 90
 
@@ -103,6 +96,13 @@ jobs:
         with:
           name: web-app
           path: ./release
+
+      - name: Rename APK with version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          if [ -f "./release/code-de-la-route-tunisie.apk" ]; then
+            cp "./release/code-de-la-route-tunisie.apk" "./release/code-de-la-route-tunisie-${TAG}.apk"
+          fi
 
       - name: List release files
         run: ls -la ./release/
