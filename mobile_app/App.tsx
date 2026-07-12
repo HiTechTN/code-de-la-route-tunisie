@@ -1521,10 +1521,12 @@ function FlashcardsScreen({ navigation }: any) {
   const currentCard = flashcards[currentIndex];
 
   const flipCard = () => {
-    Animated.sequence([
-      Animated.timing(flipAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-      Animated.timing(flipAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-    ]).start();
+    Animated.spring(flipAnim, {
+      toValue: isFlipped ? 0 : 1,
+      friction: 8,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
     setIsFlipped(!isFlipped);
   };
 
@@ -1572,44 +1574,60 @@ function FlashcardsScreen({ navigation }: any) {
       {/* Flashcard */}
       <View style={styles.flashcardWrapper}>
         <TouchableOpacity 
-          style={[styles.flashcard, isFlipped && styles.flashcardFlipped]}
+          style={[styles.flashcard]}
           onPress={flipCard}
           activeOpacity={0.9}
         >
-          <Animated.View style={[styles.flashcardContent, {
-            opacity: flipAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [1, 0, 1] })
+          {/* Front of card */}
+          <Animated.View style={[styles.flashcardContent, styles.flashcardFace, styles.flashcardFront, {
+            transform: [
+              { perspective: 1000 },
+              {
+                rotateY: flipAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '180deg']
+                })
+              }
+            ],
+            backfaceVisibility: 'hidden',
           }]}>
-            {!isFlipped ? (
-              // Front of card
-              <View style={styles.flashcardFront}>
-                <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
-                <Text style={[styles.flashcardClassNumber, { color: currentCard.color }]}>                  Classe {currentCard.classNumber}
-                </Text>
-                <Text style={styles.flashcardName}>
-                  {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
-                </Text>
-                <Text style={styles.flashcardHint}>Appuyez pour retourner</Text>
-              </View>
-            ) : (
-              // Back of card
-              <View style={styles.flashcardBack}>
-                <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
-                <Text style={[styles.flashcardClassName, { color: currentCard.color }]}>                  Classe {currentCard.classNumber}: {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
-                </Text>
-                <View style={styles.flashcardDescSection}>
-                  <Text style={styles.flashcardDescLabel}>Description:</Text>
-                  <Text style={styles.flashcardDesc}>
-                    {language === 'ar' ? currentCard.descriptionAr : currentCard.descriptionFr}
-                  </Text>
-                </View>
-                <View style={styles.flashcardDescSection}>
-                  <Text style={styles.flashcardDescLabel}>Exemples:</Text>
-                  <Text style={styles.flashcardExamples}>
-                    {language === 'ar' ? currentCard.examplesAr : currentCard.examplesFr}
-                  </Text>
-                </View>
-              </View>
-            )}
+            <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
+            <Text style={[styles.flashcardClassNumber, { color: currentCard.color }]}>              Classe {currentCard.classNumber}
+            </Text>
+            <Text style={styles.flashcardName}>
+              {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
+            </Text>
+            <Text style={styles.flashcardHint}>Appuyez pour retourner</Text>
+          </Animated.View>
+
+          {/* Back of card */}
+          <Animated.View style={[styles.flashcardContent, styles.flashcardFace, styles.flashcardBack, {
+            transform: [
+              { perspective: 1000 },
+              {
+                rotateY: flipAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['180deg', '360deg']
+                })
+              }
+            ],
+            backfaceVisibility: 'hidden',
+          }]}>
+            <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
+            <Text style={[styles.flashcardClassName, { color: currentCard.color }]}>              Classe {currentCard.classNumber}: {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
+            </Text>
+            <View style={styles.flashcardDescSection}>
+              <Text style={styles.flashcardDescLabel}>Description:</Text>
+              <Text style={styles.flashcardDesc}>
+                {language === 'ar' ? currentCard.descriptionAr : currentCard.descriptionFr}
+              </Text>
+            </View>
+            <View style={styles.flashcardDescSection}>
+              <Text style={styles.flashcardDescLabel}>Exemples:</Text>
+              <Text style={styles.flashcardExamples}>
+                {language === 'ar' ? currentCard.examplesAr : currentCard.examplesFr}
+              </Text>
+            </View>
           </Animated.View>
         </TouchableOpacity>
       </View>
