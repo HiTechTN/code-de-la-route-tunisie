@@ -49,3 +49,4 @@ Thumbs.db
 
 # EAS
 eas-build-*.json
+package-lock.json
