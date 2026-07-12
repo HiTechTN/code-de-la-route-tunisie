@@ -152,6 +152,17 @@ export const TRANSLATIONS = {
     question: { fr: 'question', ar: 'سؤال' },
   },
 
+  // ==================== FLASHCARDS ====================
+  flashcards: {
+    title: { fr: 'Flashcards', ar: 'البطاقات التعليمية' },
+    mastered: { fr: 'maîtrisées', ar: 'مُتقنة' },
+    tapToFlip: { fr: 'Appuyez pour retourner', ar: 'اضغط للقلب' },
+    previous: { fr: '← Précédent', ar: '← السابق' },
+    next: { fr: 'Suivant →', ar: 'التالي →' },
+    markMastered: { fr: '☐ Marquer', ar: '☐ تحديد كمُتقن' },
+    masteredBadge: { fr: '✅ Maîtrisé', ar: '✅ مُتقن' },
+  },
+
   // ==================== LANGUAGE ====================
   language: {
     french: { fr: '🇫🇷 Français', ar: '🇫🇷 فرنسي' },

@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { 
   StyleSheet, Text, View, TouchableOpacity, ScrollView, 
   TextInput, Modal, Dimensions, Platform, Animated,
-  Share, Vibration
+  Share, Vibration, useWindowDimensions
 } from 'react-native';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,9 +20,24 @@ import {
 } from './data/courses';
 import { TRANSLATIONS, t, getCategoryName, type Language } from './data/translations';
 
-const { width, height } = Dimensions.get('window');
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// ==================== RESPONSIVE BREAKPOINTS ====================
+const BREAKPOINTS = {
+  phone: 0,
+  tablet: 768,
+  largeTablet: 1024,
+};
+
+const useResponsive = () => {
+  const { width, height } = useWindowDimensions();
+  const isTablet = width >= BREAKPOINTS.tablet;
+  const isLargeTablet = width >= BREAKPOINTS.largeTablet;
+  const isLandscape = width > height;
+  const horizontalPadding = isLargeTablet ? 48 : isTablet ? 32 : 16;
+  return { width, height, isTablet, isLargeTablet, isLandscape, horizontalPadding };
+};
 
 // ==================== TYPES ====================
 type QuizMode = 'practice' | 'exam' | 'category' | 'favorites' | 'hazardous';
@@ -1415,6 +1430,9 @@ function FlashcardsScreen({ navigation }: any) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [masteredCards, setMasteredCards] = useState<number[]>([]);
   const flipAnim = useRef(new Animated.Value(0)).current;
+  const { isTablet, isLargeTablet, width } = useResponsive();
+  const flashcardWidth = isLargeTablet ? width * 0.5 : isTablet ? width * 0.65 : width * 0.85;
+  const flashcardHeight = isLargeTablet ? 420 : isTablet ? 380 : 340;
 
   const flashcards = [
     {
@@ -1574,7 +1592,7 @@ function FlashcardsScreen({ navigation }: any) {
       {/* Flashcard */}
       <View style={styles.flashcardWrapper}>
         <TouchableOpacity 
-          style={[styles.flashcard]}
+          style={[styles.flashcard, { width: flashcardWidth, height: flashcardHeight }]}
           onPress={flipCard}
           activeOpacity={0.9}
         >
@@ -2814,7 +2832,7 @@ const styles = StyleSheet.create({
   // Result Actions
   resultActions: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     marginBottom: 16,
   },
   retryBtn: {
@@ -3397,6 +3415,7 @@ const styles = StyleSheet.create({
     ...FONTS.medium,
   },
   flashcardNavButtons: {
+    gap: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
