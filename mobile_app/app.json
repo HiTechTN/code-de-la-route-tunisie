@@ -34,8 +34,9 @@
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": "code-de-la-route-tunisie"
+        "projectId": "16f4ede9-e717-4ba6-87a6-bfefedd738c6"
       }
-    }
+    },
+    "owner": "hitechtn-org"
   }
 }
