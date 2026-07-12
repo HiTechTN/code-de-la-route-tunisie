@@ -1859,16 +1859,17 @@ const styles = StyleSheet.create({
   // Quick Actions
   quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     marginBottom: 24,
   },
   quickActionBtn: {
-    flex: 1,
+    width: '47%',
     alignItems: 'center',
     padding: 16,
     borderRadius: 16,
-    marginHorizontal: 6,
+    marginBottom: 12,
   },
   quickActionIcon: {
     fontSize: 32,
