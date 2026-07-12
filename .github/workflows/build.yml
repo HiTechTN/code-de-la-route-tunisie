@@ -31,7 +31,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: cd mobile_app && npm ci
+        run: cd mobile_app && npm install
 
       - name: Build Android APK
         working-directory: mobile_app
