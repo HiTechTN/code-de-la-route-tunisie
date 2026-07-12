@@ -38,11 +38,6 @@ jobs:
         working-directory: mobile_app
         run: npx expo export -p web
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        with:
-          enablement: true
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
