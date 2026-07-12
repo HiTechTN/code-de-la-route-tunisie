@@ -1,0 +1,46 @@
+# Dependencies (reinstalled on EAS build servers)
+node_modules/
+
+# Build outputs
+dist/
+web-build/
+*.apk
+*.aab
+*.ipa
+
+# Expo
+.expo/
+ios/
+android/
+
+# Native build artifacts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Development files
+*.orig.*
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python scripts
+extract_*.py
+analyze_*.py
+
+# Git
+.git/
+.github/
+
+# Misc
+*.md
+LICENSE
+package-lock.json

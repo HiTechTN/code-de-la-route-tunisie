@@ -22,15 +22,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: mobile_app/package-lock.json
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install dependencies
         working-directory: mobile_app
         run: npm install
@@ -50,27 +41,59 @@ jobs:
           path: mobile_app/web-app.zip
           retention-days: 90
 
-      - name: Generate Android native project
+      - name: Setup Expo CLI
+        run: npm install -g eas-cli
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Submit EAS Build
+        id: eas-build
         working-directory: mobile_app
-        run: npx expo prebuild --platform android --clean
-
-      - name: Build Android APK
-        working-directory: mobile_app/android
-        run: ./gradlew assembleRelease
-
-      - name: Rename APK
-        working-directory: mobile_app/android/app/build/outputs/apk/release
-        run: cp app-release.apk ../../../web-app.zip 2>/dev/null || cp app-release.apk ../../../../code-de-la-route-tunisie-v${GITHUB_REF_NAME#v}.apk 2>/dev/null || true
-
-      - name: Copy APK to workspace
         run: |
-          APK_SRC="mobile_app/android/app/build/outputs/apk/release/app-release.apk"
-          if [ -f "$APK_SRC" ]; then
-            cp "$APK_SRC" mobile_app/code-de-la-route-tunisie.apk
+          echo "Submitting EAS build..."
+          BUILD_ID=$(eas build --platform android --profile preview --non-interactive --no-wait 2>&1 | tee /dev/stderr | grep -oP 'id:\s*\K[a-f0-9]+' | head -1)
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+          echo "EAS Build ID: $BUILD_ID"
+
+      - name: Wait for EAS Build
+        working-directory: mobile_app
+        run: |
+          BUILD_ID="${{ steps.eas-build.outputs.build_id }}"
+          if [ -z "$BUILD_ID" ]; then
+            echo "No build ID found, skipping..."
+            exit 0
           fi
+          
+          echo "Waiting for EAS build $BUILD_ID..."
+          MAX_ATTEMPTS=60
+          ATTEMPT=0
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            sleep 30
+            STATUS=$(eas build:view $BUILD_ID --json 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unknown'))" 2>/dev/null || echo "unknown")
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS - Status: $STATUS"
+            
+            if [ "$STATUS" = "finished" ]; then
+              echo "Build completed! Downloading APK..."
+              eas build:download --id $BUILD_ID --path ./code-de-la-route-tunisie.apk
+              echo "BUILD_SUCCESS=true" >> "$GITHUB_ENV"
+              exit 0
+            elif [ "$STATUS" = "errored" ] || [ "$STATUS" = "canceled" ]; then
+              echo "Build failed with status: $STATUS"
+              eas build:view $BUILD_ID
+              exit 0
+            fi
+          done
+          
+          echo "Build timed out after $MAX_ATTEMPTS attempts"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
+        if: env.BUILD_SUCCESS == 'true'
         with:
           name: android-apk
           path: mobile_app/code-de-la-route-tunisie.apk
