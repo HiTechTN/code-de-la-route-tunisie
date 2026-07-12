@@ -30,18 +30,15 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: cd mobile_app && npm ci
+        run: npm ci
 
       - name: Build Android APK
-        working-directory: mobile_app
         run: eas build --platform android --profile preview --non-interactive
 
       - name: Build Web App
-        working-directory: mobile_app
         run: npm run build:web
 
       - name: Package Web App
-        working-directory: mobile_app
         run: |
           mkdir -p web-build
           cp -r dist/* web-build/
@@ -51,14 +48,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
-          path: mobile_app/*.apk
+          path: '*.apk'
           retention-days: 90
 
       - name: Upload Web App artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-app
-          path: mobile_app/web-app.zip
+          path: web-app.zip
           retention-days: 90
 
   release:
