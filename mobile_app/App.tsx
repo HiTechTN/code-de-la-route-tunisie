@@ -25,7 +25,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // ==================== TYPES ====================
-type QuizMode = 'practice' | 'exam' | 'category' | 'favorites';
+type QuizMode = 'practice' | 'exam' | 'category' | 'favorites' | 'hazardous';
 
 // ==================== LANGUAGE CONTEXT ====================
 type LanguageContextType = {
@@ -238,7 +238,16 @@ function HomeScreen({ navigation }: any) {
           >
             <Text style={styles.quickActionIcon}>📚</Text>
             <Text style={[styles.quickActionText, { color: COLORS.secondary }]}>Cours</Text>
-            <Text style={styles.quickActionSubtext}>6 modules</Text>
+            <Text style={styles.quickActionSubtext}>11 modules</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.quickActionBtn, { backgroundColor: '#fff3e6' }]}
+            onPress={() => navigation.navigate('HazardousStudy')}
+          >
+            <Text style={styles.quickActionIcon}>☣️</Text>
+            <Text style={[styles.quickActionText, { color: '#ff6b35' }]}>Matieres</Text>
+            <Text style={styles.quickActionSubtext}>Dangereuses</Text>
           </TouchableOpacity>
         </View>
       </AnimatedCard>
@@ -1142,6 +1151,150 @@ function FavoritesScreen({ navigation }: any) {
   );
 }
 
+// ==================== HAZARDOUS MATERIALS STUDY SCREEN ====================
+function HazardousMaterialsStudyScreen({ navigation }: any) {
+  const { language } = useLanguage();
+  const [currentChapter, setCurrentChapter] = useState(0);
+  const [showQuiz, setShowQuiz] = useState(false);
+
+  const module = getModuleById('matieres_dangereuses');
+  const questions = getQuestionsByCategory('matieres_dangereuses');
+
+  if (!module) return <View><Text>Module non trouvé</Text></View>;
+
+  const startHazardousQuiz = () => {
+    if (questions.length === 0) {
+      alert('Aucune question disponible');
+      return;
+    }
+    const shuffled = [...questions].sort(() => 0.5 - Math.random());
+    navigation.navigate('QuizPlay', { 
+      questions: shuffled.slice(0, Math.min(10, shuffled.length)), 
+      mode: 'hazardous' 
+    });
+  };
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <AnimatedCard delay={0}>
+        <View style={[styles.moduleDetailHeader, { backgroundColor: module.color + '15' }]}>
+          <Text style={styles.moduleDetailIcon}>{module.icon}</Text>
+          <Text style={[styles.moduleDetailTitle, { color: module.color }]}>            {language === 'ar' ? module.titleAr : module.title}
+          </Text>
+          <Text style={styles.moduleDetailSubtitle}>
+            {questions.length} questions • {module.chapters.length} chapitres
+          </Text>
+        </View>
+      </AnimatedCard>
+
+      {/* Quick Stats */}
+      <AnimatedCard delay={100}>
+        <View style={styles.hmStats}>
+          <StatCard icon="📚" value={module.chapters.length} label="Chapitres" color={module.color} />
+          <StatCard icon="❓" value={questions.length} label="Questions" color={COLORS.warning} />
+          <StatCard icon="🎯" value="10" label="Quiz" color={COLORS.success} />
+        </View>
+      </AnimatedCard>
+
+      {/* Start Quiz Button */}
+      <AnimatedCard delay={200}>
+        <TouchableOpacity 
+          style={[styles.startQuizBtn, { backgroundColor: module.color }]}
+          onPress={startHazardousQuiz}
+        >
+          <Text style={styles.startQuizBtnText}>🎯 S'entraîner sur les Matières Dangereuses</Text>
+          <Text style={styles.startQuizBtnSubtext}>Testez vos connaissances</Text>
+        </TouchableOpacity>
+      </AnimatedCard>
+
+      {/* Course Content */}
+      <AnimatedCard delay={300}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>📖 Contenu du cours</Text>
+        </View>
+        {module.chapters.map((chapter, index) => (
+          <TouchableOpacity 
+            key={chapter.id}
+            style={[styles.chapterCard, currentChapter === index && styles.chapterCardActive]}
+            onPress={() => setCurrentChapter(currentChapter === index ? -1 : index)}
+          >
+            <View style={styles.chapterHeader}>
+              <View style={[styles.chapterNumber, { backgroundColor: module.color + '20' }]}>
+                <Text style={[styles.chapterNumberText, { color: module.color }]}>{index + 1}</Text>
+              </View>
+              <Text style={styles.chapterTitle}>
+                {language === 'ar' ? chapter.titleAr : chapter.title}
+              </Text>
+              <Text style={styles.chapterToggle}>{currentChapter === index ? '−' : '+'}</Text>
+            </View>
+
+            {currentChapter === index && (
+              <View style={styles.chapterContent}>
+                <Text style={styles.contentText}>
+                  {language === 'ar' ? chapter.contentAr : chapter.content}
+                </Text>
+
+                {/* Key Points */}
+                <View style={[styles.keyPointsSection, { backgroundColor: module.color + '10' }]}>
+                  <Text style={[styles.keyPointsTitle, { color: module.color }]}>📌 Points clés</Text>
+                  {(language === 'ar' ? chapter.keyPointsAr : chapter.keyPoints).map((point, i) => (
+                    <View key={i} style={styles.keyPointItem}>
+                      <Text style={[styles.keyPointBullet, { color: module.color }]}>•</Text>
+                      <Text style={styles.keyPointText}>{point}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Tips */}
+                <View style={[styles.keyPointsSection, { backgroundColor: '#fef3c7' }]}>
+                  <Text style={styles.keyPointsTitle}>💡 Conseils pratiques</Text>
+                  {(language === 'ar' ? chapter.tipsAr : chapter.tips).map((tip, i) => (
+                    <View key={i} style={styles.keyPointItem}>
+                      <Text style={styles.keyPointBullet}>✦</Text>
+                      <Text style={styles.keyPointText}>{tip}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
+        ))}
+      </AnimatedCard>
+
+      {/* Classification Table */}
+      <AnimatedCard delay={400}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>📋 Tableau des 9 classes</Text>
+        </View>
+        <View style={styles.classificationTable}>
+          {[
+            { classNumber: '1', name: 'Explosifs', icon: '💣', color: '#ef4444' },
+            { classNumber: '2', name: 'Gaz', icon: '🔴', color: '#f97316' },
+            { classNumber: '3', name: 'Liquides inflammables', icon: '🔥', color: '#eab308' },
+            { classNumber: '4', name: 'Solides inflammables', icon: '⚠️', color: '#a16207' },
+            { classNumber: '5', name: 'Oxydants', icon: '🔵', color: '#3b82f6' },
+            { classNumber: '6', name: 'Substances toxiques', icon: '☠️', color: '#22c55e' },
+            { classNumber: '7', name: 'Radioactives', icon: '☢️', color: '#a855f7' },
+            { classNumber: '8', name: 'Corrosifs', icon: '⚗️', color: '#64748b' },
+            { classNumber: '9', name: 'Dangers divers', icon: '📦', color: '#6b7280' },
+          ].map((item) => (
+            <View key={item.classNumber} style={[styles.classItem, { borderLeftColor: item.color }]}>
+              <Text style={styles.classIcon}>{item.icon}</Text>
+              <View style={styles.classInfo}>
+                <Text style={[styles.className, { color: item.color }]}>Classe {item.classNumber}</Text>
+                <Text style={styles.classDesc}>{item.name}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </AnimatedCard>
+
+      <View style={{ height: 100 }} />
+    </ScrollView>
+  );
+}
+
 // ==================== STATS SCREEN ====================
 function StatsScreen() {
   const [stats, setStats] = useState({
@@ -1350,6 +1503,7 @@ export default function App() {
       >
         <Stack.Screen name="Main" component={HomeTabs} options={{ headerShown: false }} />
         <Stack.Screen name="ModuleDetail" component={ModuleDetailScreen} options={{ title: 'Détail du module' }} />
+        <Stack.Screen name="HazardousStudy" component={HazardousMaterialsStudyScreen} options={{ title: 'Matieres Dangereuses', headerTintColor: '#ff6b35' }} />
         <Stack.Screen name="QuizPlay" component={QuizPlayScreen} options={{ title: 'Quiz', headerBackVisible: false }} />
         <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Résultat', headerBackVisible: false }} />
       </Stack.Navigator>
@@ -2591,5 +2745,57 @@ const styles = StyleSheet.create({
   },
   favoriteBtnTextActive: {
     color: COLORS.warning,
+  },
+
+  // Hazardous Materials Study Screen
+  moduleDetailSubtitle: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginTop: 8,
+  },
+  hmStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  startQuizBtnSubtext: {
+    fontSize: 13,
+    color: COLORS.white,
+    marginTop: 4,
+    opacity: 0.9,
+  },
+  classificationTable: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  classItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    borderLeftWidth: 3,
+    paddingLeft: 12,
+    marginBottom: 4,
+  },
+  classIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  classInfo: {
+    flex: 1,
+  },
+  className: {
+    fontSize: 14,
+    ...FONTS.semibold,
+  },
+  classDesc: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: 2,
   },
 });
