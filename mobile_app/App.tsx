@@ -1155,7 +1155,6 @@ function FavoritesScreen({ navigation }: any) {
 function HazardousMaterialsStudyScreen({ navigation }: any) {
   const { language } = useLanguage();
   const [currentChapter, setCurrentChapter] = useState(0);
-  const [showQuiz, setShowQuiz] = useState(false);
 
   const module = getModuleById('matieres_dangereuses');
   const questions = getQuestionsByCategory('matieres_dangereuses');
@@ -1180,7 +1179,8 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       <AnimatedCard delay={0}>
         <View style={[styles.moduleDetailHeader, { backgroundColor: module.color + '15' }]}>
           <Text style={styles.moduleDetailIcon}>{module.icon}</Text>
-          <Text style={[styles.moduleDetailTitle, { color: module.color }]}>            {language === 'ar' ? module.titleAr : module.title}
+          <Text style={[styles.moduleDetailTitle, { color: module.color }]}>
+            {language === 'ar' ? module.titleAr : module.title}
           </Text>
           <Text style={styles.moduleDetailSubtitle}>
             {questions.length} questions • {module.chapters.length} chapitres
@@ -1197,15 +1197,25 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
         </View>
       </AnimatedCard>
 
-      {/* Start Quiz Button */}
+      {/* Action Buttons */}
       <AnimatedCard delay={200}>
-        <TouchableOpacity 
-          style={[styles.startQuizBtn, { backgroundColor: module.color }]}
-          onPress={startHazardousQuiz}
-        >
-          <Text style={styles.startQuizBtnText}>🎯 S'entraîner sur les Matières Dangereuses</Text>
-          <Text style={styles.startQuizBtnSubtext}>Testez vos connaissances</Text>
-        </TouchableOpacity>
+        <View style={styles.hmActionButtons}>
+          <TouchableOpacity 
+            style={[styles.startQuizBtn, { backgroundColor: module.color }]}
+            onPress={startHazardousQuiz}
+          >
+            <Text style={styles.startQuizBtnText}>🎯 S'entraîner</Text>
+            <Text style={styles.startQuizBtnSubtext}>Quiz de 10 questions</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.startQuizBtn, { backgroundColor: '#8b5cf6' }]}
+            onPress={() => navigation.navigate('Flashcards')}
+          >
+            <Text style={styles.startQuizBtnText}>🃏 Flashcards</Text>
+            <Text style={styles.startQuizBtnSubtext}>Révision rapide</Text>
+          </TouchableOpacity>
+        </View>
       </AnimatedCard>
 
       {/* Course Content */}
@@ -1292,6 +1302,257 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
 
       <View style={{ height: 100 }} />
     </ScrollView>
+  );
+}
+
+// ==================== FLASHCARDS SCREEN ====================
+function FlashcardsScreen({ navigation }: any) {
+  const { language } = useLanguage();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [masteredCards, setMasteredCards] = useState<number[]>([]);
+  const flipAnim = useRef(new Animated.Value(0)).current;
+
+  const flashcards = [
+    {
+      classNumber: '1',
+      nameFr: 'Explosifs',
+      nameAr: 'المتفجرات',
+      icon: '💣',
+      color: '#ef4444',
+      descriptionFr: 'Matières pouvant exploser (munitions, feux d\'artifice, dynamite). Interdit sur autoroute.',
+      descriptionAr: 'مواد يمكن أن تنفجر (الذخيرة، الألعاب النارية، الديناميت). ممنوع على الطرق السريعة.',
+      examplesFr: 'Munitions, feux d\'artifice, dynamite, pétards',
+      examplesAr: 'الذخيرة، الألعاب النارية، الديناميت، المفرقعات'
+    },
+    {
+      classNumber: '2',
+      nameFr: 'Gaz',
+      nameAr: 'الغازات',
+      icon: '🔴',
+      color: '#f97316',
+      descriptionFr: 'Gaz comprimés, liquéfiés, dissous. Bouteilles bien fixées et ventilées.',
+      descriptionAr: 'غازات مضغوطة، مسيولة، محلولة. أسطوانات مثبتة جيداً ومؤمّنة.',
+      examplesFr: 'Propane, oxygène, hydrogène, azote',
+      examplesAr: 'البروبان، الأكسجين، الهيدروجين، النيتروجين'
+    },
+    {
+      classNumber: '3',
+      nameFr: 'Liquides inflammables',
+      nameAr: 'السوائل القابلة للاشتعال',
+      icon: '🔥',
+      color: '#eab308',
+      descriptionFr: 'Point éclair < 61°C. Interdiction de fumer à proximité.',
+      descriptionAr: 'نقطة وميض < 61 درجة مئوية. منع التدخين بالقرب.',
+      examplesFr: 'Essence, alcool, kérosène, acétone',
+      examplesAr: 'البنزين، الكحول، الكيروسين، الأسيتون'
+    },
+    {
+      classNumber: '4',
+      nameFr: 'Solides inflammables',
+      nameAr: 'الصلبات القابلة للاشتعال',
+      icon: '⚠️',
+      color: '#a16207',
+      descriptionFr: '4a: Inflammables, 4b: Au contact de l\'eau, 4c: Auto-oxydants',
+      descriptionAr: '4أ: قابلة للاشتعال، 4ب: عند ملامسة الماء، 4ج: مؤكسدة ذاتية',
+      examplesFr: 'Allumettes, magnésium, sodium, calcium',
+      examplesAr: 'ال الكبريت، المغنيزيوم، الصوديوم، الكالسيوم'
+    },
+    {
+      classNumber: '5',
+      nameFr: 'Oxydants et organiques peroxydés',
+      nameAr: 'المؤكسدة والعضوية البيروكسيدية',
+      icon: '🔵',
+      color: '#3b82f6',
+      descriptionFr: 'Soutiennent la combustion. Ex: peroxydes, permanganates.',
+      descriptionAr: 'تدعم الاحتراق. مثال: البيروكسيدات، البرمنغانتات.',
+      examplesFr: 'Peroxydes, permanganates, nitrates',
+      examplesAr: 'البيروكسيدات، البرمنغانتات، النترات'
+    },
+    {
+      classNumber: '6',
+      nameFr: 'Substances toxiques et infectieuses',
+      nameAr: 'المواد السامة والمعدية',
+      icon: '☠️',
+      color: '#22c55e',
+      descriptionFr: '6a: Toxiques, 6b: Infectieuses. Ex: pesticides, virus.',
+      descriptionAr: '6أ: سامة، 6ب: معدية. مثال: المبيدات الحشرية، الفيروسات.',
+      examplesFr: 'Pesticides,arsenic, cyanure, virus',
+      examplesAr: 'المبيدات الحشرية، الزرنيخ، السيانيد، الفيروسات'
+    },
+    {
+      classNumber: '7',
+      nameFr: 'Matières radioactives',
+      nameAr: 'المواد المشعة',
+      icon: '☢️',
+      color: '#a855f7',
+      descriptionFr: 'Émettent des rayonnements ionisants. Signalisation spéciale obligatoire.',
+      descriptionAr: 'تصدر إشعاعات مؤيَّنة. إشارة خاصة إلزامية.',
+      examplesFr: 'Uranium, cobalt 60, césium 137',
+      examplesAr: 'اليورانيوم، الكوبالت 60، السيزيوم 137'
+    },
+    {
+      classNumber: '8',
+      nameFr: 'Corrosifs',
+      nameAr: 'المواد المcorrosive',
+      icon: '⚗️',
+      color: '#64748b',
+      descriptionFr: 'Attaquent les métaux et la peau. Ex: acides, soude caustique.',
+      descriptionAr: 'تهاجم المعادن والجلد. مثال: الأحماض، الصودا الكاوية.',
+      examplesFr: 'Acide sulfurique, acide chlorhydrique, soude',
+      examplesAr: 'حمض الكبريتيك، حمض الهيدروكلوريك، الصودا'
+    },
+    {
+      classNumber: '9',
+      nameFr: 'Dangers divers',
+      nameAr: 'مخاطر متنوعة',
+      icon: '📦',
+      color: '#6b7280',
+      descriptionFr: 'Matières présentant un danger. Ex: amiante, batteries lithium.',
+      descriptionAr: 'مواد تشكل خطراً. مثال: الأسبستوس، بطاريات الليثيوم.',
+      examplesFr: 'Amiante, batteries lithium, matériel polluant',
+      examplesAr: 'الأسبستوس، بطاريات الليثيوم، معدات ملوثة'
+    }
+  ];
+
+  const currentCard = flashcards[currentIndex];
+
+  const flipCard = () => {
+    Animated.sequence([
+      Animated.timing(flipAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.timing(flipAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+    ]).start();
+    setIsFlipped(!isFlipped);
+  };
+
+  const nextCard = () => {
+    setIsFlipped(false);
+    setCurrentIndex((prev) => (prev + 1) % flashcards.length);
+  };
+
+  const prevCard = () => {
+    setIsFlipped(false);
+    setCurrentIndex((prev) => (prev - 1 + flashcards.length) % flashcards.length);
+  };
+
+  const toggleMastered = () => {
+    if (masteredCards.includes(currentIndex)) {
+      setMasteredCards(masteredCards.filter(i => i !== currentIndex));
+    } else {
+      setMasteredCards([...masteredCards, currentIndex]);
+    }
+  };
+
+  const progress = masteredCards.length / flashcards.length;
+
+  return (
+    <View style={styles.flashcardContainer}>
+      {/* Header */}
+      <View style={styles.flashcardHeader}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.flashcardBackBtn}>
+          <Text style={styles.flashcardBackText}>← Retour</Text>
+        </TouchableOpacity>
+        <Text style={styles.flashcardTitle}>🃏 Flashcards</Text>
+        <Text style={styles.flashcardProgress}>
+          {currentIndex + 1}/{flashcards.length}
+        </Text>
+      </View>
+
+      {/* Progress Bar */}
+      <View style={styles.flashcardProgressBar}>
+        <ProgressBar progress={progress} color={COLORS.success} height={8} />
+        <Text style={styles.flashcardMasteredText}>
+          {masteredCards.length}/{flashcards.length} maîtrisées
+        </Text>
+      </View>
+
+      {/* Flashcard */}
+      <View style={styles.flashcardWrapper}>
+        <TouchableOpacity 
+          style={[styles.flashcard, isFlipped && styles.flashcardFlipped]}
+          onPress={flipCard}
+          activeOpacity={0.9}
+        >
+          <Animated.View style={[styles.flashcardContent, {
+            opacity: flipAnim.interpolate({ inputRange: [0, 0.5, 1], outputRange: [1, 0, 1] })
+          }]}>
+            {!isFlipped ? (
+              // Front of card
+              <View style={styles.flashcardFront}>
+                <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
+                <Text style={[styles.flashcardClassNumber, { color: currentCard.color }]}>                  Classe {currentCard.classNumber}
+                </Text>
+                <Text style={styles.flashcardName}>
+                  {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
+                </Text>
+                <Text style={styles.flashcardHint}>Appuyez pour retourner</Text>
+              </View>
+            ) : (
+              // Back of card
+              <View style={styles.flashcardBack}>
+                <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
+                <Text style={[styles.flashcardClassName, { color: currentCard.color }]}>                  Classe {currentCard.classNumber}: {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
+                </Text>
+                <View style={styles.flashcardDescSection}>
+                  <Text style={styles.flashcardDescLabel}>Description:</Text>
+                  <Text style={styles.flashcardDesc}>
+                    {language === 'ar' ? currentCard.descriptionAr : currentCard.descriptionFr}
+                  </Text>
+                </View>
+                <View style={styles.flashcardDescSection}>
+                  <Text style={styles.flashcardDescLabel}>Exemples:</Text>
+                  <Text style={styles.flashcardExamples}>
+                    {language === 'ar' ? currentCard.examplesAr : currentCard.examplesFr}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Navigation Buttons */}
+      <View style={styles.flashcardNavButtons}>
+        <TouchableOpacity 
+          style={[styles.flashcardNavBtn, styles.flashcardNavBtnPrev]}
+          onPress={prevCard}
+        >
+          <Text style={styles.flashcardNavBtnText}>← Précédent</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.flashcardNavBtn, 
+            masteredCards.includes(currentIndex) ? styles.flashcardMasteredBtn : styles.flashcardMasterBtn
+          ]}
+          onPress={toggleMastered}
+        >
+          <Text style={styles.flashcardNavBtnText}>
+            {masteredCards.includes(currentIndex) ? '✅ Maîtrisé' : '☐ Marquer'}
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.flashcardNavBtn, styles.flashcardNavBtnNext]}
+          onPress={nextCard}
+        >
+          <Text style={styles.flashcardNavBtnText}>Suivant →</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Dots Indicator */}
+      <View style={styles.flashcardDots}>
+        {flashcards.map((_, index) => (
+          <View 
+            key={index}
+            style={[
+              styles.flashcardDot,
+              index === currentIndex && styles.flashcardDotActive,
+              masteredCards.includes(index) && styles.flashcardDotMastered
+            ]}
+          />
+        ))}
+      </View>
+    </View>
   );
 }
 
@@ -1504,6 +1765,7 @@ export default function App() {
         <Stack.Screen name="Main" component={HomeTabs} options={{ headerShown: false }} />
         <Stack.Screen name="ModuleDetail" component={ModuleDetailScreen} options={{ title: 'Détail du module' }} />
         <Stack.Screen name="HazardousStudy" component={HazardousMaterialsStudyScreen} options={{ title: 'Matieres Dangereuses', headerTintColor: '#ff6b35' }} />
+        <Stack.Screen name="Flashcards" component={FlashcardsScreen} options={{ title: 'Flashcards', headerShown: false }} />
         <Stack.Screen name="QuizPlay" component={QuizPlayScreen} options={{ title: 'Quiz', headerBackVisible: false }} />
         <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Résultat', headerBackVisible: false }} />
       </Stack.Navigator>
@@ -2759,6 +3021,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 20,
   },
+  hmActionButtons: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
   startQuizBtnSubtext: {
     fontSize: 13,
     color: COLORS.white,
@@ -2797,5 +3064,190 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textLight,
     marginTop: 2,
+  },
+
+  // Flashcards Screen
+  flashcardContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  flashcardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    paddingTop: 60,
+    backgroundColor: COLORS.white,
+  },
+  flashcardBackBtn: {
+    padding: 8,
+  },
+  flashcardBackText: {
+    fontSize: 16,
+    color: COLORS.primary,
+    ...FONTS.semibold,
+  },
+  flashcardTitle: {
+    fontSize: 18,
+    ...FONTS.bold,
+    color: COLORS.text,
+  },
+  flashcardProgress: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    ...FONTS.medium,
+  },
+  flashcardProgressBar: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  flashcardMasteredText: {
+    fontSize: 12,
+    color: COLORS.success,
+    textAlign: 'center',
+    marginTop: 8,
+    ...FONTS.medium,
+  },
+  flashcardWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  flashcard: {
+    width: '100%',
+    maxWidth: 360,
+    height: 400,
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+    overflow: 'hidden',
+  },
+  flashcardFlipped: {
+    backgroundColor: '#f0f9ff',
+  },
+  flashcardContent: {
+    flex: 1,
+    padding: 24,
+  },
+  flashcardFront: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  flashcardBack: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  flashcardIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  flashcardClassNumber: {
+    fontSize: 28,
+    ...FONTS.bold,
+    marginBottom: 8,
+  },
+  flashcardName: {
+    fontSize: 22,
+    ...FONTS.semibold,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  flashcardHint: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    ...FONTS.medium,
+  },
+  flashcardClassName: {
+    fontSize: 18,
+    ...FONTS.bold,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  flashcardDescSection: {
+    marginBottom: 16,
+  },
+  flashcardDescLabel: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    ...FONTS.semibold,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  flashcardDesc: {
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
+  },
+  flashcardExamples: {
+    fontSize: 14,
+    color: COLORS.primary,
+    lineHeight: 20,
+    ...FONTS.medium,
+  },
+  flashcardNavButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  flashcardNavBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginHorizontal: 6,
+  },
+  flashcardNavBtnPrev: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  flashcardNavBtnNext: {
+    backgroundColor: COLORS.primary,
+  },
+  flashcardMasterBtn: {
+    backgroundColor: COLORS.white,
+    borderWidth: 1,
+    borderColor: COLORS.success,
+  },
+  flashcardMasteredBtn: {
+    backgroundColor: COLORS.success,
+  },
+  flashcardNavBtnText: {
+    fontSize: 14,
+    ...FONTS.semibold,
+    color: COLORS.text,
+  },
+  flashcardDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingBottom: 32,
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+  },
+  flashcardDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.border,
+    marginHorizontal: 3,
+    marginVertical: 4,
+  },
+  flashcardDotActive: {
+    backgroundColor: COLORS.primary,
+    width: 24,
+  },
+  flashcardDotMastered: {
+    backgroundColor: COLORS.success,
   },
 });
