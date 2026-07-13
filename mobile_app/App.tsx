@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { 
   StyleSheet, Text, View, TouchableOpacity, ScrollView, 
   TextInput, Modal, Dimensions, Platform, Animated,
-  Share, Vibration, useWindowDimensions
+  Share, Vibration, useWindowDimensions, Image
 } from 'react-native';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +20,7 @@ import {
   type CourseModule, type Chapter 
 } from './data/courses';
 import { TRANSLATIONS, t, getCategoryName, type Language } from './data/translations';
+import { getCourseModuleImage } from './data/course_images';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -54,88 +55,16 @@ type Achievement = {
   unlockedDate?: string;
 };
 
-const ACHIEVEMENTS: Achievement[] = [
-  {
-    id: 'first_quiz',
-    name: 'Premier Quiz',
-    description: 'Complétez votre premier quiz',
-    icon: '🎯',
-    color: '#10b981',
-    requirement: '1 quiz complété',
-    unlocked: false,
-  },
-  {
-    id: 'quiz_apprentice',
-    name: 'Apprenti Quiz',
-    description: 'Complétez 5 quiz',
-    icon: '📚',
-    color: '#3b82f6',
-    requirement: '5 quiz complétés',
-    unlocked: false,
-  },
-  {
-    id: 'quiz_master',
-    name: 'Maître Quiz',
-    description: 'Complétez 10 quiz',
-    icon: '🏆',
-    color: '#f59e0b',
-    requirement: '10 quiz complétés',
-    unlocked: false,
-  },
-  {
-    id: 'perfect_score',
-    name: 'Score Parfait',
-    description: 'Obtenez 100% à un quiz',
-    icon: '⭐',
-    color: '#ef4444',
-    requirement: '100% à un quiz',
-    unlocked: false,
-  },
-  {
-    id: 'week_warrior',
-    name: 'Guerrier de la Semaine',
-    description: 'Maintenez une série de 7 jours',
-    icon: '🔥',
-    color: '#f97316',
-    requirement: 'Série de 7 jours',
-    unlocked: false,
-  },
-  {
-    id: 'hm_explorer',
-    name: 'Explorateur HM',
-    description: 'Complétez tous les chapitres des matières dangereuses',
-    icon: '☢️',
-    color: '#a855f7',
-    requirement: 'Tous les chapitres HM lus',
-    unlocked: false,
-  },
-  {
-    id: 'hm_flashcards_master',
-    name: 'Maître Flashcards',
-    description: 'Maîtrisez toutes les flashcards HM',
-    icon: '🃏',
-    color: '#8b5cf6',
-    requirement: '9 flashcards maîtrisées',
-    unlocked: false,
-  },
-  {
-    id: 'bookworm',
-    name: 'Bibliophile',
-    description: 'Ajoutez 5 questions en favoris',
-    icon: '📖',
-    color: '#06b6d4',
-    requirement: '5 favoris ajoutés',
-    unlocked: false,
-  },
-  {
-    id: 'collector',
-    name: 'Collectionneur',
-    description: 'Ajoutez 10 questions en favoris',
-    icon: '📦',
-    color: '#7c3aed',
-    requirement: '10 favoris ajoutés',
-    unlocked: false,
-  },
+const ACHIEVEMENTS_LIST = [
+  { id: 'first_quiz', nameKey: 'achievements.firstQuizName', descKey: 'achievements.firstQuizDesc', reqKey: 'achievements.firstQuizReq', icon: '🎯', color: '#10b981' },
+  { id: 'quiz_apprentice', nameKey: 'achievements.quizApprenticeName', descKey: 'achievements.quizApprenticeDesc', reqKey: 'achievements.quizApprenticeReq', icon: '📚', color: '#3b82f6' },
+  { id: 'quiz_master', nameKey: 'achievements.quizMasterName', descKey: 'achievements.quizMasterDesc', reqKey: 'achievements.quizMasterReq', icon: '🏆', color: '#f59e0b' },
+  { id: 'perfect_score', nameKey: 'achievements.perfectScoreName', descKey: 'achievements.perfectScoreDesc', reqKey: 'achievements.perfectScoreReq', icon: '⭐', color: '#ef4444' },
+  { id: 'week_warrior', nameKey: 'achievements.weekWarriorName', descKey: 'achievements.weekWarriorDesc', reqKey: 'achievements.weekWarriorReq', icon: '🔥', color: '#f97316' },
+  { id: 'hm_explorer', nameKey: 'achievements.hmExplorerName', descKey: 'achievements.hmExplorerDesc', reqKey: 'achievements.hmExplorerReq', icon: '☢️', color: '#a855f7' },
+  { id: 'hm_flashcards_master', nameKey: 'achievements.hmFlashcardsName', descKey: 'achievements.hmFlashcardsDesc', reqKey: 'achievements.hmFlashcardsReq', icon: '🃏', color: '#8b5cf6' },
+  { id: 'bookworm', nameKey: 'achievements.bookwormName', descKey: 'achievements.bookwormDesc', reqKey: 'achievements.bookwormReq', icon: '📖', color: '#06b6d4' },
+  { id: 'collector', nameKey: 'achievements.collectorName', descKey: 'achievements.collectorDesc', reqKey: 'achievements.collectorReq', icon: '📦', color: '#7c3aed' },
 ];
 
 // ==================== LANGUAGE CONTEXT ====================
@@ -313,7 +242,7 @@ function HomeScreen({ navigation }: any) {
           <View style={styles.headerStats}>
             <View style={styles.headerStatItem}>
               <Text style={styles.headerStatValue}>{totalQuestions}</Text>
-              <Text style={styles.headerStatLabel}>Questions</Text>
+              <Text style={styles.headerStatLabel}>{t('home.questions', language)}</Text>
             </View>
           </View>
         </View>
@@ -326,12 +255,12 @@ function HomeScreen({ navigation }: any) {
           onPress={() => navigation.navigate('QuizTab', { screen: 'QuizHome' })}
         >
           <View style={styles.progressCardHeader}>
-            <Text style={styles.progressCardTitle}>📊 Votre progression</Text>
+            <Text style={styles.progressCardTitle}>{t('home.progress', language)}</Text>
             <Text style={styles.progressCardPercent}>{Math.round(progress * 100)}%</Text>
           </View>
           <ProgressBar progress={progress} color={COLORS.success} height={10} />
           <Text style={styles.progressCardText}>
-            {Math.round(progress * totalQuestions)} / {totalQuestions} questions répondues
+            {Math.round(progress * totalQuestions)} / {totalQuestions} {t('home.questionsAnswered', language)}
           </Text>
         </TouchableOpacity>
       </AnimatedCard>
@@ -340,16 +269,16 @@ function HomeScreen({ navigation }: any) {
       <AnimatedCard delay={150}>
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
-            <Text style={styles.streakTitle}>🔥 Série d'étude</Text>
+            <Text style={styles.streakTitle}>🔥 {t('home.studyStreak', language)}</Text>
             <Text style={[styles.streakCount, { color: streak > 0 ? COLORS.warning : COLORS.textMuted }]}>
-              {streak} jour{streak > 1 ? 's' : ''}
+              {streak} {streak > 1 ? t('home.days', language) : t('home.day', language)}
             </Text>
           </View>
           <View style={styles.streakDays}>
             {[0, 1, 2, 3, 4, 5, 6].map((dayOffset) => {
               const date = new Date();
               date.setDate(date.getDate() - (6 - dayOffset));
-              const dayName = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+              const dayName = date.toLocaleDateString(language === 'ar' ? 'ar-TN' : 'fr-FR', { weekday: 'short' });
               const isToday = dayOffset === 6;
               const isStreak = dayOffset >= (7 - streak) && streak > 0;
               return (
@@ -372,7 +301,7 @@ function HomeScreen({ navigation }: any) {
           </View>
           {bestStreak > 0 && (
             <Text style={styles.streakBest}>
-              🏆 Meilleure série: {bestStreak} jour{bestStreak > 1 ? 's' : ''}
+              🏆 {t('home.bestStreak', language)}: {bestStreak} {bestStreak > 1 ? t('home.days', language) : t('home.day', language)}
             </Text>
           )}
         </View>
@@ -386,8 +315,8 @@ function HomeScreen({ navigation }: any) {
             onPress={() => navigation.navigate('QuizTab', { screen: 'QuizHome', params: { mode: 'exam' } })}
           >
             <Text style={styles.quickActionIcon}>📝</Text>
-            <Text style={[styles.quickActionText, { color: COLORS.primary }]}>Examen</Text>
-            <Text style={styles.quickActionSubtext}>30 questions</Text>
+            <Text style={[styles.quickActionText, { color: COLORS.primary }]}>{t('home.exam', language)}</Text>
+            <Text style={styles.quickActionSubtext}>{t('home.examSubtext', language)}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -395,8 +324,8 @@ function HomeScreen({ navigation }: any) {
             onPress={() => navigation.navigate('QuizTab', { screen: 'QuizHome', params: { mode: 'practice' } })}
           >
             <Text style={styles.quickActionIcon}>🎯</Text>
-            <Text style={[styles.quickActionText, { color: COLORS.success }]}>Entraînement</Text>
-            <Text style={styles.quickActionSubtext}>10 questions</Text>
+            <Text style={[styles.quickActionText, { color: COLORS.success }]}>{t('home.training', language)}</Text>
+            <Text style={styles.quickActionSubtext}>{t('home.trainingSubtext', language)}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -404,8 +333,8 @@ function HomeScreen({ navigation }: any) {
             onPress={() => navigation.navigate('CourseTab', { screen: 'Courses' })}
           >
             <Text style={styles.quickActionIcon}>📚</Text>
-            <Text style={[styles.quickActionText, { color: COLORS.secondary }]}>Cours</Text>
-            <Text style={styles.quickActionSubtext}>11 modules</Text>
+            <Text style={[styles.quickActionText, { color: COLORS.secondary }]}>{t('home.courses', language)}</Text>
+            <Text style={styles.quickActionSubtext}>{t('home.coursesSubtext', language)}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -494,6 +423,7 @@ function HomeScreen({ navigation }: any) {
 
 // ==================== COURSES SCREEN ====================
 function CoursesScreen({ navigation }: any) {
+  const { language } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState<Language>('fr');
   const totalChapters = getTotalChapters();
 
@@ -518,9 +448,9 @@ function CoursesScreen({ navigation }: any) {
       {/* Stats */}
       <AnimatedCard delay={0}>
         <View style={styles.courseStats}>
-          <StatCard icon="📚" value={COURSE_MODULES.length} label="Modules" color={COLORS.primary} />
-          <StatCard icon="📖" value={totalChapters} label="Chapitres" color={COLORS.success} />
-          <StatCard icon="❓" value={QUESTIONS.length} label="Questions" color={COLORS.warning} />
+          <StatCard icon="📚" value={COURSE_MODULES.length} label={t('courses.modules', language)} color={COLORS.primary} />
+          <StatCard icon="📖" value={totalChapters} label={t('courses.chapters', language)} color={COLORS.success} />
+          <StatCard icon="❓" value={QUESTIONS.length} label={t('courses.questions', language)} color={COLORS.warning} />
         </View>
       </AnimatedCard>
 
@@ -533,14 +463,18 @@ function CoursesScreen({ navigation }: any) {
           >
             <View style={styles.moduleCardHeader}>
               <View style={[styles.moduleIcon, { backgroundColor: module.color + '20' }]}>
-                <Text style={styles.moduleIconText}>{module.icon}</Text>
+                {module.image ? (
+                  <Image source={getCourseModuleImage(module.id)} style={styles.moduleIconImage} />
+                ) : (
+                  <Text style={styles.moduleIconText}>{module.icon}</Text>
+                )}
               </View>
               <View style={styles.moduleInfo}>
                 <Text style={styles.moduleTitle}>
                   {selectedLanguage === 'ar' ? module.titleAr : module.title}
                 </Text>
                 <Text style={styles.moduleSubtitle}>
-                  {module.chapters.length} chapitre{module.chapters.length > 1 ? 's' : ''}
+                  {module.chapters.length} {module.chapters.length > 1 ? t('courses.chaptersCountPlural', language) : t('courses.chaptersCount', language)}
                 </Text>
               </View>
               <Text style={styles.moduleArrow}>→</Text>
@@ -570,14 +504,18 @@ function ModuleDetailScreen({ route, navigation }: any) {
   const module = getModuleById(moduleId);
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
 
-  if (!module) return <View><Text>Module non trouvé</Text></View>;
+  if (!module) return <View><Text>{t('courses.moduleNotFound', language)}</Text></View>;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Module Header */}
       <AnimatedCard delay={0}>
         <View style={[styles.moduleDetailHeader, { backgroundColor: module.color + '10' }]}>
-          <Text style={styles.moduleDetailIcon}>{module.icon}</Text>
+          {module.image ? (
+            <Image source={getCourseModuleImage(module.id)} style={styles.moduleDetailImage} />
+          ) : (
+            <Text style={styles.moduleDetailIcon}>{module.icon}</Text>
+          )}
           <Text style={[styles.moduleDetailTitle, { color: module.color }]}>
             {language === 'ar' ? module.titleAr : module.title}
           </Text>
@@ -610,7 +548,7 @@ function ModuleDetailScreen({ route, navigation }: any) {
 
                 {/* Key Points */}
                 <View style={styles.keyPointsSection}>
-                  <Text style={styles.keyPointsTitle}>📌 Points clés</Text>
+                  <Text style={styles.keyPointsTitle}>{t('courses.keyPoints', language)}</Text>
                   {(language === 'ar' ? chapter.keyPointsAr : chapter.keyPoints).map((point, i) => (
                     <View key={i} style={styles.keyPointItem}>
                       <Text style={styles.keyPointBullet}>•</Text>
@@ -621,7 +559,7 @@ function ModuleDetailScreen({ route, navigation }: any) {
 
                 {/* Tips */}
                 <View style={[styles.keyPointsSection, { backgroundColor: '#fef3c7' }]}>
-                  <Text style={styles.keyPointsTitle}>💡 Conseils pratiques</Text>
+                  <Text style={styles.keyPointsTitle}>{t('courses.practicalTips', language)}</Text>
                   {(language === 'ar' ? chapter.tipsAr : chapter.tips).map((tip, i) => (
                     <View key={i} style={styles.keyPointItem}>
                       <Text style={styles.keyPointBullet}>✦</Text>
@@ -653,7 +591,7 @@ function ModuleDetailScreen({ route, navigation }: any) {
                     }
                   }}
                 >
-                  <Text style={styles.practiceBtnText}>🎯 S'entraîner sur ce chapitre</Text>
+                  <Text style={styles.practiceBtnText}>{t('courses.practice', language)}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -668,6 +606,7 @@ function ModuleDetailScreen({ route, navigation }: any) {
 
 // ==================== QUIZ HOME SCREEN ====================
 function QuizHomeScreen({ navigation, route }: any) {
+  const { language } = useLanguage();
   const [selectedMode, setSelectedMode] = useState<QuizMode>(route?.params?.mode || 'practice');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(route?.params?.categoryId || null);
   const [questionCount, setQuestionCount] = useState(10);
@@ -684,13 +623,13 @@ function QuizHomeScreen({ navigation, route }: any) {
         const favorites = JSON.parse(await AsyncStorage.getItem('favorites') || '[]');
         const favQuestions = QUESTIONS.filter(q => favorites.includes(q.id));
         if (favQuestions.length === 0) {
-          alert('Aucune question en favoris. Marquez des questions pendant le quiz !');
+          alert(t('quiz.noFavoritesInQuiz', language));
           return;
         }
         const shuffled = [...favQuestions].sort(() => 0.5 - Math.random());
         questions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
       } catch (e) {
-        alert('Erreur lors du chargement des favoris');
+        alert(t('quiz.favoritesLoadError', language));
         return;
       }
     } else if (selectedMode === 'category' && selectedCategory) {
@@ -706,7 +645,7 @@ function QuizHomeScreen({ navigation, route }: any) {
     }
 
     if (questions.length === 0) {
-      alert('Aucune question disponible pour cette sélection');
+      alert(t('quiz.noQuestions', language));
       return;
     }
 
@@ -724,14 +663,14 @@ function QuizHomeScreen({ navigation, route }: any) {
       {/* Mode Selection */}
       <AnimatedCard delay={0}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>🎯 Mode de quiz</Text>
+          <Text style={styles.sectionTitle}>{t('quiz.quizMode', language)}</Text>
         </View>
         <View style={styles.modeSelector}>
           {[
-            { id: 'practice', icon: '🎯', label: 'Entraînement', desc: 'Libre' },
-            { id: 'exam', icon: '📝', label: 'Examen', desc: '30 questions' },
-            { id: 'category', icon: '🏷️', label: 'Par catégorie', desc: 'Choisir' },
-            { id: 'favorites', icon: '⭐', label: 'Favoris', desc: 'Réviser' },
+            { id: 'practice', icon: '🎯', label: t('quiz.training', language), desc: t('quiz.trainingDesc', language) },
+            { id: 'exam', icon: '📝', label: t('quiz.exam', language), desc: t('quiz.examDesc', language) },
+            { id: 'category', icon: '🏷️', label: t('quiz.byCategory', language), desc: t('quiz.byCategoryDesc', language) },
+            { id: 'favorites', icon: '⭐', label: t('quiz.favorites', language), desc: t('quiz.favoritesDesc', language) },
           ].map(mode => (
             <TouchableOpacity
               key={mode.id}
@@ -752,14 +691,14 @@ function QuizHomeScreen({ navigation, route }: any) {
       {selectedMode === 'category' && (
         <AnimatedCard delay={100}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🏷️ Choisir une catégorie</Text>
+            <Text style={styles.sectionTitle}>{t('quiz.chooseCategory', language)}</Text>
           </View>
           <TouchableOpacity 
             style={styles.categoryPicker}
             onPress={() => setShowCategoryPicker(true)}
           >
             <Text style={styles.categoryPickerText}>
-              {selectedCat ? `${selectedCat.icon} ${selectedCat.name}` : 'Sélectionner une catégorie...'}
+              {selectedCat ? `${selectedCat.icon} ${selectedCat.name}` : t('quiz.selectCategory', language)}
             </Text>
             <Text style={styles.categoryPickerArrow}>▼</Text>
           </TouchableOpacity>
@@ -790,7 +729,7 @@ function QuizHomeScreen({ navigation, route }: any) {
       {selectedMode === 'practice' && (
         <AnimatedCard delay={100}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>📊 Nombre de questions</Text>
+            <Text style={styles.sectionTitle}>{t('quiz.numberOfQuestions', language)}</Text>
           </View>
           <View style={styles.countSelector}>
             {[5, 10, 15, 20, 30].map(count => (
@@ -808,14 +747,14 @@ function QuizHomeScreen({ navigation, route }: any) {
 
           {/* Difficulty Selector */}
           <View style={[styles.sectionHeader, { marginTop: 16 }]}>
-            <Text style={styles.sectionTitle}>🎯 Difficulté</Text>
+            <Text style={styles.sectionTitle}>{t('quiz.difficulty', language)}</Text>
           </View>
           <View style={styles.countSelector}>
             {[
-              { id: 'all', label: 'Toutes' },
-              { id: 'facile', label: 'Facile' },
-              { id: 'moyen', label: 'Moyen' },
-              { id: 'difficile', label: 'Difficile' },
+              { id: 'all', label: t('quiz.all', language) },
+              { id: 'facile', label: t('quiz.easy', language) },
+              { id: 'moyen', label: t('quiz.medium', language) },
+              { id: 'difficile', label: t('quiz.hard', language) },
             ].map(diff => (
               <TouchableOpacity
                 key={diff.id}
@@ -835,7 +774,7 @@ function QuizHomeScreen({ navigation, route }: any) {
       <AnimatedCard delay={200}>
         <TouchableOpacity style={styles.startQuizBtn} onPress={startQuiz}>
           <Text style={styles.startQuizBtnText}>
-            {selectedMode === 'exam' ? '🚀 Commencer l\'examen' : '🚀 Commencer le quiz'}
+            {selectedMode === 'exam' ? t('quiz.startExam', language) : t('quiz.startQuiz', language)}
           </Text>
         </TouchableOpacity>
       </AnimatedCard>
@@ -848,6 +787,7 @@ function QuizHomeScreen({ navigation, route }: any) {
 // ==================== QUIZ PLAY SCREEN ====================
 function QuizPlayScreen({ route, navigation }: any) {
   const { questions, mode, categoryId } = route.params;
+  const { language } = useLanguage();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -1002,8 +942,8 @@ function QuizPlayScreen({ route, navigation }: any) {
               const isCorrect = i === q.correctAnswer;
               const showResult = isAnswered;
               
-              let optionStyle = styles.optionButton;
-              let optionTextStyle = styles.optionText;
+              let optionStyle: any = styles.optionButton;
+              let optionTextStyle: any = styles.optionText;
               
               if (showResult) {
                 if (isCorrect) {
@@ -1041,7 +981,7 @@ function QuizPlayScreen({ route, navigation }: any) {
           <AnimatedCard delay={200}>
             <View style={[styles.explanationCard, showCorrect ? styles.explanationCorrect : styles.explanationWrong]}>
               <Text style={styles.explanationTitle}>
-                {showCorrect ? '✅ Bonne réponse !' : '❌ Mauvaise réponse'}
+                {showCorrect ? t('quizPlay.correctAnswer', language) : t('quizPlay.wrongAnswer', language)}
               </Text>
               <Text style={styles.explanationText}>{q.explanation}</Text>
             </View>
@@ -1053,7 +993,7 @@ function QuizPlayScreen({ route, navigation }: any) {
           <AnimatedCard delay={250}>
             <TouchableOpacity style={styles.nextBtn} onPress={nextQuestion}>
               <Text style={styles.nextBtnText}>
-                {currentQuestion < questions.length - 1 ? 'Question suivante →' : 'Voir les résultats →'}
+                {currentQuestion < questions.length - 1 ? t('quizPlay.nextQuestion', language) : t('quizPlay.viewResults', language)}
               </Text>
             </TouchableOpacity>
           </AnimatedCard>
@@ -1066,6 +1006,7 @@ function QuizPlayScreen({ route, navigation }: any) {
 // ==================== QUIZ RESULT SCREEN ====================
 function QuizResultScreen({ route, navigation }: any) {
   const { score, total, answers, questions, mode } = route.params;
+  const { language } = useLanguage();
   const percentage = Math.round((score / total) * 100);
   const passed = percentage >= 80;
 
@@ -1135,11 +1076,11 @@ function QuizResultScreen({ route, navigation }: any) {
   };
 
   const getMessage = () => {
-    if (percentage >= 90) return { text: 'Excellent ! 🏆', color: COLORS.success };
-    if (percentage >= 80) return { text: 'Très bien ! 🎉', color: COLORS.success };
-    if (percentage >= 60) return { text: 'Bien ! 👏', color: COLORS.warning };
-    if (percentage >= 40) return { text: 'Peut mieux faire 💪', color: COLORS.warning };
-    return { text: 'À revoir... 📚', color: COLORS.danger };
+    if (percentage >= 90) return { text: t('quizResult.excellent', language), color: COLORS.success };
+    if (percentage >= 80) return { text: t('quizResult.veryGood', language), color: COLORS.success };
+    if (percentage >= 60) return { text: t('quizResult.good', language), color: COLORS.warning };
+    if (percentage >= 40) return { text: t('quizResult.canDoBetter', language), color: COLORS.warning };
+    return { text: t('quizResult.toReview', language), color: COLORS.danger };
   };
 
   const msg = getMessage();
@@ -1157,10 +1098,10 @@ function QuizResultScreen({ route, navigation }: any) {
           {mode === 'exam' && (
             <View style={styles.examResult}>
               <Text style={[styles.examResultText, { color: passed ? COLORS.success : COLORS.danger }]}>
-                {passed ? '✅ EXAMEN RÉUSSI' : '❌ EXAMEN ÉCHOUÉ'}
+                {passed ? t('quizResult.examPassed', language) : t('quizResult.examFailed', language)}
               </Text>
               <Text style={styles.examResultSubtext}>
-                {passed ? '24/30 minimum requis' : '24/30 minimum requis'}
+                {passed ? t('quizResult.minScore', language) : t('quizResult.minScore', language)}
               </Text>
             </View>
           )}
@@ -1170,16 +1111,16 @@ function QuizResultScreen({ route, navigation }: any) {
       {/* Stats */}
       <AnimatedCard delay={100}>
         <View style={styles.resultStats}>
-          <StatCard icon="✅" value={score} label="Bonnes réponses" color={COLORS.success} />
-          <StatCard icon="❌" value={total - score} label="Mauvaises" color={COLORS.danger} />
-          <StatCard icon="📊" value={`${percentage}%`} label="Score" color={COLORS.primary} />
+          <StatCard icon="✅" value={score} label={t('quizResult.correctAnswers', language)} color={COLORS.success} />
+          <StatCard icon="❌" value={total - score} label={t('quizResult.wrongAnswers', language)} color={COLORS.danger} />
+          <StatCard icon="📊" value={`${percentage}%`} label={t('quizResult.score', language)} color={COLORS.primary} />
         </View>
       </AnimatedCard>
 
       {/* Answers Review */}
       <AnimatedCard delay={200}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📋 Détail des réponses</Text>
+          <Text style={styles.sectionTitle}>📋 {t('quizResult.detailAnswers', language)}</Text>
         </View>
         {questions.map((q: Question, index: number) => {
           const userAnswer = answers[index];
@@ -1193,12 +1134,12 @@ function QuizResultScreen({ route, navigation }: any) {
               <Text style={styles.reviewQuestion} numberOfLines={2}>{q.question}</Text>
               {!isCorrect && userAnswer !== null && (
                 <Text style={styles.reviewWrongAnswer}>
-                  Votre réponse: {q.options[userAnswer]}
+                  {t('quizResult.yourAnswer', language) + ': '}{q.options[userAnswer]}
                 </Text>
               )}
               {!isCorrect && (
                 <Text style={styles.reviewCorrectAnswer}>
-                  Bonne réponse: {q.options[q.correctAnswer]}
+                  {t('quizResult.correctResponse', language) + ': '}{q.options[q.correctAnswer]}
                 </Text>
               )}
             </View>
@@ -1213,13 +1154,13 @@ function QuizResultScreen({ route, navigation }: any) {
             style={styles.retryBtn}
             onPress={() => navigation.navigate('QuizHome')}
           >
-            <Text style={styles.retryBtnText}>🔄 Recommencer</Text>
+            <Text style={styles.retryBtnText}>{t('quizResult.retry', language)}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.retryBtn, { backgroundColor: COLORS.secondary }]}
             onPress={() => navigation.navigate('HomeTab')}
           >
-            <Text style={styles.retryBtnText}>🏠 Accueil</Text>
+            <Text style={styles.retryBtnText}>{t('quizResult.home', language)}</Text>
           </TouchableOpacity>
         </View>
       </AnimatedCard>
@@ -1231,6 +1172,7 @@ function QuizResultScreen({ route, navigation }: any) {
 
 // ==================== FAVORITES SCREEN ====================
 function FavoritesScreen({ navigation }: any) {
+  const { language } = useLanguage();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [favoriteQuestions, setFavoriteQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1258,7 +1200,7 @@ function FavoritesScreen({ navigation }: any) {
 
   const startFavoriteQuiz = () => {
     if (favoriteQuestions.length === 0) {
-      alert('Aucune question en favoris');
+      alert(t('favorites.noFavorites', language));
       return;
     }
     const shuffled = [...favoriteQuestions].sort(() => 0.5 - Math.random());
@@ -1271,7 +1213,7 @@ function FavoritesScreen({ navigation }: any) {
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text>Chargement...</Text>
+        <Text>{t('common.loading', language)}</Text>
       </View>
     );
   }
@@ -1282,9 +1224,9 @@ function FavoritesScreen({ navigation }: any) {
       <AnimatedCard delay={0}>
         <View style={styles.favoritesHeader}>
           <Text style={styles.favoritesHeaderIcon}>⭐</Text>
-          <Text style={styles.favoritesHeaderTitle}>Mes Favoris</Text>
+          <Text style={styles.favoritesHeaderTitle}>{t('favorites.title', language)}</Text>
           <Text style={styles.favoritesHeaderSubtitle}>
-            {favorites.length} question{favorites.length > 1 ? 's' : ''} marquée{favorites.length > 1 ? 's' : ''}
+            {favorites.length} {favorites.length > 1 ? t('favorites.questionsPlural', language) : t('favorites.questionSingular', language)}
           </Text>
         </View>
       </AnimatedCard>
@@ -1292,8 +1234,8 @@ function FavoritesScreen({ navigation }: any) {
       {/* Stats */}
       <AnimatedCard delay={100}>
         <View style={styles.favoritesStats}>
-          <StatCard icon="⭐" value={favorites.length} label="Favoris" color={COLORS.warning} />
-          <StatCard icon="📝" value="Quiz" label="Réviser" color={COLORS.primary} />
+          <StatCard icon="⭐" value={favorites.length} label={t('favorites.favCount', language)} color={COLORS.warning} />
+          <StatCard icon="📝" value="Quiz" label={t('favorites.reviewLabel', language)} color={COLORS.primary} />
         </View>
       </AnimatedCard>
 
@@ -1301,8 +1243,8 @@ function FavoritesScreen({ navigation }: any) {
       {favorites.length > 0 && (
         <AnimatedCard delay={200}>
           <TouchableOpacity style={styles.startFavoriteQuizBtn} onPress={startFavoriteQuiz}>
-            <Text style={styles.startFavoriteQuizBtnText}>🎯 Quiz des Favoris</Text>
-            <Text style={styles.startFavoriteQuizBtnSubtext}>Réviser les questions marquées</Text>
+            <Text style={styles.startFavoriteQuizBtnText}>{t('favorites.reviewQuiz', language)}</Text>
+            <Text style={styles.startFavoriteQuizBtnSubtext}>{t('favorites.reviewQuizSubtext', language)}</Text>
           </TouchableOpacity>
         </AnimatedCard>
       )}
@@ -1310,15 +1252,15 @@ function FavoritesScreen({ navigation }: any) {
       {/* Favorite Questions List */}
       <AnimatedCard delay={300}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📋 Questions favorites</Text>
+          <Text style={styles.sectionTitle}>📋 {t('favorites.favoriteQuestions', language)}</Text>
         </View>
         
         {favoriteQuestions.length === 0 ? (
           <View style={styles.emptyFavorites}>
             <Text style={styles.emptyFavoritesIcon}>⭐</Text>
-            <Text style={styles.emptyFavoritesText}>Aucune question en favoris</Text>
+            <Text style={styles.emptyFavoritesText}>{t('favorites.noFavorites', language)}</Text>
             <Text style={styles.emptyFavoritesSubtext}>
-              Marquez les questions difficiles pendant le quiz pour les réviser ici
+              {t('favorites.noFavoritesSubtext', language)}
             </Text>
           </View>
         ) : (
@@ -1350,7 +1292,7 @@ function FavoritesScreen({ navigation }: any) {
                       mode: 'practice' 
                     })}
                   >
-                    <Text style={styles.reviewFavoriteBtnText}>📝 Réviser</Text>
+                    <Text style={styles.reviewFavoriteBtnText}>{t('favorites.review', language)}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -1433,11 +1375,11 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
     } catch (e) {}
   };
 
-  if (!module) return <View><Text>Module non trouvé</Text></View>;
+  if (!module) return <View><Text>{t('courses.moduleNotFound', language)}</Text></View>;
 
   const startHazardousQuiz = () => {
     if (questions.length === 0) {
-      alert('Aucune question disponible');
+      alert(t('hazardous.noQuestions', language));
       return;
     }
     const shuffled = [...questions].sort(() => 0.5 - Math.random());
@@ -1459,12 +1401,16 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       {/* Header */}
       <AnimatedCard delay={0}>
         <View style={[styles.moduleDetailHeader, { backgroundColor: module.color + '15' }]}>
-          <Text style={styles.moduleDetailIcon}>{module.icon}</Text>
+          {module.image ? (
+            <Image source={getCourseModuleImage(module.id)} style={styles.moduleDetailImage} />
+          ) : (
+            <Text style={styles.moduleDetailIcon}>{module.icon}</Text>
+          )}
           <Text style={[styles.moduleDetailTitle, { color: module.color }]}>
             {language === 'ar' ? module.titleAr : module.title}
           </Text>
           <Text style={styles.moduleDetailSubtitle}>
-            {questions.length} questions • {module.chapters.length} chapitres
+            {questions.length} {t('common.questions', language)} • {module.chapters.length} {t('courses.chaptersCount', language)}
           </Text>
         </View>
       </AnimatedCard>
@@ -1473,7 +1419,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       <AnimatedCard delay={50}>
         <View style={styles.progressTrackerCard}>
           <View style={styles.progressTrackerHeader}>
-            <Text style={styles.progressTrackerTitle}>📊 Votre progression</Text>
+            <Text style={styles.progressTrackerTitle}>📊 {t('hazardous.progress', language)}</Text>
             <Text style={[styles.progressTrackerPercent, { color: overallProgress >= 0.8 ? COLORS.success : COLORS.primary }]}>
               {Math.round(overallProgress * 100)}%
             </Text>
@@ -1484,22 +1430,22 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
             <View style={styles.progressTrackerStatItem}>
               <Text style={styles.progressTrackerStatIcon}>📖</Text>
               <Text style={styles.progressTrackerStatValue}>{chaptersCompleted}/{totalChapters}</Text>
-              <Text style={styles.progressTrackerStatLabel}>Chapitres</Text>
+              <Text style={styles.progressTrackerStatLabel}>{t('courses.chapters', language)}</Text>
             </View>
             <View style={styles.progressTrackerStatItem}>
               <Text style={styles.progressTrackerStatIcon}>❓</Text>
               <Text style={styles.progressTrackerStatValue}>{progress.questionsAnswered}</Text>
-              <Text style={styles.progressTrackerStatLabel}>Questions</Text>
+              <Text style={styles.progressTrackerStatLabel}>{t('courses.questions', language)}</Text>
             </View>
             <View style={styles.progressTrackerStatItem}>
               <Text style={styles.progressTrackerStatIcon}>✅</Text>
               <Text style={styles.progressTrackerStatValue}>{progress.questionsCorrect}</Text>
-              <Text style={styles.progressTrackerStatLabel}>Correctes</Text>
+              <Text style={styles.progressTrackerStatLabel}>{t('hazardous.correct', language)}</Text>
             </View>
             <View style={styles.progressTrackerStatItem}>
               <Text style={styles.progressTrackerStatIcon}>📝</Text>
               <Text style={styles.progressTrackerStatValue}>{progress.quizzesCompleted}</Text>
-              <Text style={styles.progressTrackerStatLabel}>Quiz</Text>
+              <Text style={styles.progressTrackerStatLabel}>{t('nav.quiz', language)}</Text>
             </View>
           </View>
         </View>
@@ -1508,9 +1454,9 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       {/* Quick Stats */}
       <AnimatedCard delay={100}>
         <View style={styles.hmStats}>
-          <StatCard icon="📚" value={module.chapters.length} label="Chapitres" color={module.color} />
-          <StatCard icon="❓" value={questions.length} label="Questions" color={COLORS.warning} />
-          <StatCard icon="🎯" value="10" label="Quiz" color={COLORS.success} />
+          <StatCard icon="📚" value={module.chapters.length} label={t('courses.chapters', language)} color={module.color} />
+          <StatCard icon="❓" value={questions.length} label={t('courses.questions', language)} color={COLORS.warning} />
+          <StatCard icon="🎯" value="10" label={t('nav.quiz', language)} color={COLORS.success} />
         </View>
       </AnimatedCard>
 
@@ -1521,16 +1467,16 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
             style={[styles.startQuizBtn, { backgroundColor: module.color }]}
             onPress={startHazardousQuiz}
           >
-            <Text style={styles.startQuizBtnText}>🎯 S'entraîner</Text>
-            <Text style={styles.startQuizBtnSubtext}>Quiz de 10 questions</Text>
+            <Text style={styles.startQuizBtnText}>🎯 {t('hazardous.train', language)}</Text>
+            <Text style={styles.startQuizBtnSubtext}>{t('hazardous.quizSubtext', language)}</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.startQuizBtn, { backgroundColor: '#8b5cf6' }]}
             onPress={() => navigation.navigate('Flashcards')}
           >
-            <Text style={styles.startQuizBtnText}>🃏 Flashcards</Text>
-            <Text style={styles.startQuizBtnSubtext}>Révision rapide</Text>
+            <Text style={styles.startQuizBtnText}>🃏 {t('flashcards.title', language)}</Text>
+            <Text style={styles.startQuizBtnSubtext}>{t('hazardous.quickReview', language)}</Text>
           </TouchableOpacity>
         </View>
         
@@ -1540,7 +1486,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       {/* Course Content */}
       <AnimatedCard delay={300}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📖 Contenu du cours</Text>
+          <Text style={styles.sectionTitle}>📖 {t('hazardous.courseContent', language)}</Text>
         </View>
         {module.chapters.map((chapter, index) => (
           <TouchableOpacity 
@@ -1578,7 +1524,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
 
                 {/* Key Points */}
                 <View style={[styles.keyPointsSection, { backgroundColor: module.color + '10' }]}>
-                  <Text style={[styles.keyPointsTitle, { color: module.color }]}>📌 Points clés</Text>
+                  <Text style={[styles.keyPointsTitle, { color: module.color }]}>📌 {t('courses.keyPoints', language)}</Text>
                   {(language === 'ar' ? chapter.keyPointsAr : chapter.keyPoints).map((point, i) => (
                     <View key={i} style={styles.keyPointItem}>
                       <Text style={[styles.keyPointBullet, { color: module.color }]}>•</Text>
@@ -1589,7 +1535,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
 
                 {/* Tips */}
                 <View style={[styles.keyPointsSection, { backgroundColor: '#fef3c7' }]}>
-                  <Text style={styles.keyPointsTitle}>💡 Conseils pratiques</Text>
+                  <Text style={styles.keyPointsTitle}>💡 {t('courses.practicalTips', language)}</Text>
                   {(language === 'ar' ? chapter.tipsAr : chapter.tips).map((tip, i) => (
                     <View key={i} style={styles.keyPointItem}>
                       <Text style={styles.keyPointBullet}>✦</Text>
@@ -1606,24 +1552,24 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       {/* Classification Table */}
       <AnimatedCard delay={400}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📋 Tableau des 9 classes</Text>
+          <Text style={styles.sectionTitle}>📋 {t('hazardous.classTable', language)}</Text>
         </View>
         <View style={styles.classificationTable}>
           {[
-            { classNumber: '1', name: 'Explosifs', icon: '💣', color: '#ef4444' },
-            { classNumber: '2', name: 'Gaz', icon: '🔴', color: '#f97316' },
-            { classNumber: '3', name: 'Liquides inflammables', icon: '🔥', color: '#eab308' },
-            { classNumber: '4', name: 'Solides inflammables', icon: '⚠️', color: '#a16207' },
-            { classNumber: '5', name: 'Oxydants', icon: '🔵', color: '#3b82f6' },
-            { classNumber: '6', name: 'Substances toxiques', icon: '☠️', color: '#22c55e' },
-            { classNumber: '7', name: 'Radioactives', icon: '☢️', color: '#a855f7' },
-            { classNumber: '8', name: 'Corrosifs', icon: '⚗️', color: '#64748b' },
-            { classNumber: '9', name: 'Dangers divers', icon: '📦', color: '#6b7280' },
+            { classNumber: '1', name: t('hazardous.class1', language), icon: '💣', color: '#ef4444' },
+            { classNumber: '2', name: t('hazardous.class2', language), icon: '🔴', color: '#f97316' },
+            { classNumber: '3', name: t('hazardous.class3', language), icon: '🔥', color: '#eab308' },
+            { classNumber: '4', name: t('hazardous.class4', language), icon: '⚠️', color: '#a16207' },
+            { classNumber: '5', name: t('hazardous.class5', language), icon: '🔵', color: '#3b82f6' },
+            { classNumber: '6', name: t('hazardous.class6', language), icon: '☠️', color: '#22c55e' },
+            { classNumber: '7', name: t('hazardous.class7', language), icon: '☢️', color: '#a855f7' },
+            { classNumber: '8', name: t('hazardous.class8', language), icon: '⚗️', color: '#64748b' },
+            { classNumber: '9', name: t('hazardous.class9', language), icon: '📦', color: '#6b7280' },
           ].map((item) => (
             <View key={item.classNumber} style={[styles.classItem, { borderLeftColor: item.color }]}>
               <Text style={styles.classIcon}>{item.icon}</Text>
               <View style={styles.classInfo}>
-                <Text style={[styles.className, { color: item.color }]}>Classe {item.classNumber}</Text>
+                <Text style={[styles.className, { color: item.color }]}>{t('hazardous.class', language)} {item.classNumber}</Text>
                 <Text style={styles.classDesc}>{item.name}</Text>
               </View>
             </View>
@@ -1634,7 +1580,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
       {/* Study History Summary */}
       <AnimatedCard delay={500}>
         <View style={styles.hmSummaryCard}>
-          <Text style={styles.hmSummaryTitle}>📋 Historique d'étude</Text>
+          <Text style={styles.hmSummaryTitle}>📋 {t('hazardous.studyHistory', language)}</Text>
           
           <View style={styles.hmSummaryGrid}>
             <View style={styles.hmSummaryItem}>
@@ -1642,7 +1588,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
               <Text style={[styles.hmSummaryValue, { color: module.color }]}>
                 {progress.chaptersViewed.length}/{totalChapters}
               </Text>
-              <Text style={styles.hmSummaryLabel}>Chapitres lus</Text>
+              <Text style={styles.hmSummaryLabel}>{t('hazardous.chaptersRead', language)}</Text>
             </View>
             
             <View style={styles.hmSummaryItem}>
@@ -1650,7 +1596,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
               <Text style={[styles.hmSummaryValue, { color: COLORS.warning }]}>
                 {progress.questionsAnswered}
               </Text>
-              <Text style={styles.hmSummaryLabel}>Questions répondues</Text>
+              <Text style={styles.hmSummaryLabel}>{t('hazardous.questionsAnswered', language)}</Text>
             </View>
             
             <View style={styles.hmSummaryItem}>
@@ -1658,7 +1604,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
               <Text style={[styles.hmSummaryValue, { color: COLORS.success }]}>
                 {progress.questionsCorrect}
               </Text>
-              <Text style={styles.hmSummaryLabel}>Bonnes réponses</Text>
+              <Text style={styles.hmSummaryLabel}>{t('quizResult.correctAnswers', language)}</Text>
             </View>
             
             <View style={styles.hmSummaryItem}>
@@ -1666,7 +1612,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
               <Text style={[styles.hmSummaryValue, { color: COLORS.primary }]}>
                 {progress.quizzesCompleted}
               </Text>
-              <Text style={styles.hmSummaryLabel}>Quiz effectués</Text>
+              <Text style={styles.hmSummaryLabel}>{t('stats.quizzesTaken', language)}</Text>
             </View>
           </View>
           
@@ -1689,7 +1635,7 @@ function HazardousMaterialsStudyScreen({ navigation }: any) {
           )}
           
           <View style={styles.hmSummaryTimeline}>
-            <Text style={styles.hmSummaryTimelineTitle}>Progression par chapitre</Text>
+            <Text style={styles.hmSummaryTimelineTitle}>{t('hazardous.chapterProgression', language)}</Text>
             {module.chapters.map((chapter, index) => {
               const isViewed = progress.chaptersViewed.includes(index);
               return (
@@ -1924,7 +1870,7 @@ function FlashcardsScreen({ navigation }: any) {
             backfaceVisibility: 'hidden',
           }]}>
             <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
-            <Text style={[styles.flashcardClassNumber, { color: currentCard.color }]}>              Classe {currentCard.classNumber}
+            <Text style={[styles.flashcardClassNumber, { color: currentCard.color }]}>              {t('flashcards.classLabel', language)} {currentCard.classNumber}
             </Text>
             <Text style={styles.flashcardName}>
               {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
@@ -1946,16 +1892,16 @@ function FlashcardsScreen({ navigation }: any) {
             backfaceVisibility: 'hidden',
           }]}>
             <Text style={styles.flashcardIcon}>{currentCard.icon}</Text>
-            <Text style={[styles.flashcardClassName, { color: currentCard.color }]}>              Classe {currentCard.classNumber}: {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
+            <Text style={[styles.flashcardClassName, { color: currentCard.color }]}>              {t('flashcards.classLabel', language)} {currentCard.classNumber}: {language === 'ar' ? currentCard.nameAr : currentCard.nameFr}
             </Text>
             <View style={styles.flashcardDescSection}>
-              <Text style={styles.flashcardDescLabel}>Description:</Text>
+              <Text style={styles.flashcardDescLabel}>{t('flashcards.description', language)}</Text>
               <Text style={styles.flashcardDesc}>
                 {language === 'ar' ? currentCard.descriptionAr : currentCard.descriptionFr}
               </Text>
             </View>
             <View style={styles.flashcardDescSection}>
-              <Text style={styles.flashcardDescLabel}>Exemples:</Text>
+              <Text style={styles.flashcardDescLabel}>{t('flashcards.examples', language)}</Text>
               <Text style={styles.flashcardExamples}>
                 {language === 'ar' ? currentCard.examplesAr : currentCard.examplesFr}
               </Text>
@@ -2011,6 +1957,7 @@ function FlashcardsScreen({ navigation }: any) {
 
 // ==================== STATS SCREEN ====================
 function StatsScreen() {
+  const { language } = useLanguage();
   const [stats, setStats] = useState({
     totalQuizzes: 0,
     averageScore: 0,
@@ -2057,11 +2004,11 @@ function StatsScreen() {
         <View style={styles.statsOverview}>
           <View style={styles.statsCircle}>
             <Text style={styles.statsCircleValue}>{stats.totalQuizzes}</Text>
-            <Text style={styles.statsCircleLabel}>Quiz effectués</Text>
+            <Text style={styles.statsCircleLabel}>{t('stats.quizzesTaken', language)}</Text>
           </View>
           <View style={styles.statsCircle}>
             <Text style={[styles.statsCircleValue, { color: COLORS.success }]}>{stats.averageScore}%</Text>
-            <Text style={styles.statsCircleLabel}>Score moyen</Text>
+            <Text style={styles.statsCircleLabel}>{t('stats.averageScore', language)}</Text>
           </View>
         </View>
       </AnimatedCard>
@@ -2069,9 +2016,9 @@ function StatsScreen() {
       {/* Progress Overview */}
       <AnimatedCard delay={100}>
         <View style={styles.statsCard}>
-          <Text style={styles.statsCardTitle}>📈 Progression</Text>
+          <Text style={styles.statsCardTitle}>📈 {t('stats.progression', language)}</Text>
           <View style={styles.progressStat}>
-            <Text style={styles.progressStatLabel}>Questions répondues</Text>
+            <Text style={styles.progressStatLabel}>{t('stats.questionsAnswered', language)}</Text>
             <Text style={styles.progressStatValue}>
               {stats.answeredQuestions} / {stats.totalQuestions}
             </Text>
@@ -2082,7 +2029,7 @@ function StatsScreen() {
             height={12}
           />
           <Text style={styles.progressStatPercent}>
-            {Math.round((stats.answeredQuestions / stats.totalQuestions) * 100)}% complété
+            {Math.round((stats.answeredQuestions / stats.totalQuestions) * 100)}% {t('stats.completed', language)}
           </Text>
         </View>
       </AnimatedCard>
@@ -2090,7 +2037,7 @@ function StatsScreen() {
       {/* Category Breakdown */}
       <AnimatedCard delay={200}>
         <View style={styles.statsCard}>
-          <Text style={styles.statsCardTitle}>🏷️ Par catégorie</Text>
+          <Text style={styles.statsCardTitle}>🏷️ {t('stats.byCategory', language)}</Text>
           {CATEGORIES.map(cat => {
             const catQuestions = getQuestionsByCategory(cat.id);
             const catAnswered = Math.min(catQuestions.length, Math.floor(stats.answeredQuestions / CATEGORIES.length));
@@ -2117,18 +2064,18 @@ function StatsScreen() {
       {/* Difficulty Stats */}
       <AnimatedCard delay={300}>
         <View style={styles.statsCard}>
-          <Text style={styles.statsCardTitle}>🎯 Par difficulté</Text>
+          <Text style={styles.statsCardTitle}>🎯 {t('stats.byDifficulty', language)}</Text>
           {[
-            { id: 'facile', label: 'Facile', color: COLORS.success, icon: '😊' },
-            { id: 'moyen', label: 'Moyen', color: COLORS.warning, icon: '😐' },
-            { id: 'difficile', label: 'Difficile', color: COLORS.danger, icon: '😰' },
+            { id: 'facile', label: t('quiz.easy', language), color: COLORS.success, icon: '😊' },
+            { id: 'moyen', label: t('quiz.medium', language), color: COLORS.warning, icon: '😐' },
+            { id: 'difficile', label: t('quiz.hard', language), color: COLORS.danger, icon: '😰' },
           ].map(diff => {
             const diffQuestions = QUESTIONS.filter(q => q.difficulty === diff.id);
             return (
               <View key={diff.id} style={styles.diffStatItem}>
                 <Text style={styles.diffStatIcon}>{diff.icon}</Text>
                 <Text style={styles.diffStatName}>{diff.label}</Text>
-                <Text style={[styles.diffStatCount, { color: diff.color }]}>{diffQuestions.length} questions</Text>
+                <Text style={[styles.diffStatCount, { color: diff.color }]}>{diffQuestions.length} {t('common.questions', language)}</Text>
               </View>
             );
           })}
@@ -2138,7 +2085,7 @@ function StatsScreen() {
       {/* Reset Button */}
       <AnimatedCard delay={400}>
         <TouchableOpacity style={styles.resetBtn} onPress={resetStats}>
-          <Text style={styles.resetBtnText}>🗑️ Réinitialiser les statistiques</Text>
+          <Text style={styles.resetBtnText}>{t('stats.reset', language)}</Text>
         </TouchableOpacity>
       </AnimatedCard>
 
@@ -2149,6 +2096,7 @@ function StatsScreen() {
 
 // ==================== TAB NAVIGATOR ====================
 function HomeTabs() {
+  const { language } = useLanguage();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -2164,7 +2112,7 @@ function HomeTabs() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🏠</Text>,
-          tabBarLabel: 'Accueil',
+          tabBarLabel: t('nav.home', language),
         }}
       />
       <Tab.Screen 
@@ -2172,7 +2120,7 @@ function HomeTabs() {
         component={CoursesScreen}
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📚</Text>,
-          tabBarLabel: 'Cours',
+          tabBarLabel: t('nav.courses', language),
         }}
       />
       <Tab.Screen 
@@ -2180,7 +2128,7 @@ function HomeTabs() {
         component={QuizHomeScreen}
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>❓</Text>,
-          tabBarLabel: 'Quiz',
+          tabBarLabel: t('nav.quiz', language),
         }}
       />
       <Tab.Screen 
@@ -2188,7 +2136,7 @@ function HomeTabs() {
         component={FavoritesScreen}
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>⭐</Text>,
-          tabBarLabel: 'Favoris',
+          tabBarLabel: t('nav.favorites', language),
         }}
       />
       <Tab.Screen 
@@ -2196,7 +2144,7 @@ function HomeTabs() {
         component={StatsScreen}
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📊</Text>,
-          tabBarLabel: 'Stats',
+          tabBarLabel: t('nav.stats', language),
         }}
       />
     </Tab.Navigator>
@@ -2204,7 +2152,8 @@ function HomeTabs() {
 }
 
 // ==================== MAIN APP ====================
-export default function App() {
+function AppInner() {
+  const { language } = useLanguage();
   return (
     <NavigationContainer>
       <StatusBar style="dark" />
@@ -2216,13 +2165,21 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Main" component={HomeTabs} options={{ headerShown: false }} />
-        <Stack.Screen name="ModuleDetail" component={ModuleDetailScreen} options={{ title: 'Détail du module' }} />
-        <Stack.Screen name="HazardousStudy" component={HazardousMaterialsStudyScreen} options={{ title: 'Matieres Dangereuses', headerTintColor: '#ff6b35' }} />
-        <Stack.Screen name="Flashcards" component={FlashcardsScreen} options={{ title: 'Flashcards', headerShown: false }} />
-        <Stack.Screen name="QuizPlay" component={QuizPlayScreen} options={{ title: 'Quiz', headerBackVisible: false }} />
-        <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Résultat', headerBackVisible: false }} />
+        <Stack.Screen name="ModuleDetail" component={ModuleDetailScreen} options={{ title: t('nav.moduleDetail', language) }} />
+        <Stack.Screen name="HazardousStudy" component={HazardousMaterialsStudyScreen} options={{ title: t('nav.hazardousStudy', language), headerTintColor: '#ff6b35' }} />
+        <Stack.Screen name="Flashcards" component={FlashcardsScreen} options={{ title: t('flashcards.title', language), headerShown: false }} />
+        <Stack.Screen name="QuizPlay" component={QuizPlayScreen} options={{ title: t('nav.quiz', language), headerBackVisible: false }} />
+        <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: t('nav.result', language), headerBackVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppInner />
+    </LanguageProvider>
   );
 }
 
@@ -2574,7 +2531,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: 16,
-    marginHorizontal: 16,
     marginBottom: 12,
     marginHorizontal: "1.5%",
     borderLeftWidth: 4,
@@ -2595,6 +2551,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+    overflow: 'hidden',
+  },
+  moduleIconImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
   },
   moduleIconText: {
     fontSize: 24,
@@ -2651,6 +2613,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginHorizontal: "1.5%",
   },
+  moduleDetailImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 16,
+    marginBottom: 12,
+  },
   moduleDetailTitle: {
     fontSize: 22,
     ...FONTS.bold,
@@ -2661,7 +2629,6 @@ const styles = StyleSheet.create({
   chapterCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    marginHorizontal: 16,
     marginBottom: 12,
     marginHorizontal: "1.5%",
     overflow: 'hidden',
@@ -3851,6 +3818,14 @@ const styles = StyleSheet.create({
   },
   flashcardDotMastered: {
     backgroundColor: COLORS.success,
+  },
+  flashcardFace: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
 
   // Hazardous Materials Summary Styles
   hmSummaryCard: {
@@ -3951,6 +3926,5 @@ const styles = StyleSheet.create({
   hmSummaryTimelineTextCompleted: {
     color: COLORS.success,
     ...FONTS.semibold,
-  },
   },
 });

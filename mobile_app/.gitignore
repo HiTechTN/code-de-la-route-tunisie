@@ -80,6 +80,10 @@ eas-build-*.json
 extract_*.py
 analyze_*.py
 
+# Large extracted/compressed images (not needed in repo, icons are in assets/)
+assets/course_images/
+assets/course_image_mapping.json
+
 # Build artifacts
 dist/
 web-build/

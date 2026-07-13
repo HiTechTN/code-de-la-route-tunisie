@@ -9,10 +9,13 @@ export const TRANSLATIONS = {
   // ==================== NAVIGATION ====================
   nav: {
     home: { fr: 'Accueil', ar: 'الرئيسية' },
-    courses: { fr: 'Cours', ar: ' الدروس' },
+    courses: { fr: 'Cours', ar: 'الدروس' },
     quiz: { fr: 'Quiz', ar: 'الاختبار' },
     favorites: { fr: 'Favoris', ar: 'المفضلة' },
     stats: { fr: 'Stats', ar: 'الإحصائيات' },
+    moduleDetail: { fr: 'Détail du module', ar: 'تفاصيل الوحدة' },
+    hazardousStudy: { fr: 'Matières Dangereuses', ar: 'المواد الخطرة' },
+    result: { fr: 'Résultat', ar: 'النتيجة' },
   },
 
   // ==================== HOME SCREEN ====================
@@ -30,12 +33,18 @@ export const TRANSLATIONS = {
     training: { fr: 'Entraînement', ar: 'التدريب' },
     trainingSubtext: { fr: '10 questions', ar: '10 أسئلة' },
     courses: { fr: 'Cours', ar: 'الدروس' },
-    coursesSubtext: { fr: '6 modules', ar: '6 وحدات' },
+    coursesSubtext: { fr: '11 modules', ar: '11 وحدة' },
     categories: { fr: 'Catégories', ar: 'الفئات' },
     seeAll: { fr: 'Voir tout →', ar: 'عرض الكل →' },
     popularQuestions: { fr: 'Questions populaires', ar: 'الأسئلة الشائعة' },
     dailyTip: { fr: 'Astuce du jour', ar: 'نصيحة اليوم' },
     tipText: { fr: 'La formule magique pour la distance de sécurité: votre vitesse en km/h divisée par 10 = distance en mètres. Par exemple à 90 km/h, gardez 9 mètres minimum !', ar: 'الصيغة السحرية لمسافة الأمان: سرعتك بالكيلومتر في الساعة مقسومة على 10 = المسافة بالأمتار. مثال: عند 90 كم/ساعة، اترك 9 أمتار على الأقل!' },
+    studyStreak: { fr: 'Série d\'étude', ar: 'سلسلة الدراسة' },
+    day: { fr: 'jour', ar: 'يوم' },
+    days: { fr: 'jours', ar: 'أيام' },
+    bestStreak: { fr: 'Meilleure série', ar: 'أفضل سلسلة' },
+    hazardousTitle: { fr: 'Matières Dangereuses', ar: 'المواد الخطرة' },
+    hazardousSubtext: { fr: 'HM', ar: 'مواد خطرة' },
   },
 
   // ==================== COURSES SCREEN ====================
@@ -74,6 +83,8 @@ export const TRANSLATIONS = {
     startQuiz: { fr: '🚀 Commencer le quiz', ar: '🚀 بدء الاختبار' },
     startExam: { fr: '🚀 Commencer l\'examen', ar: '🚀 بدء الامتحان' },
     noQuestions: { fr: 'Aucune question disponible pour cette sélection', ar: 'لا توجد أسئلة متاحة لهذا الاختيار' },
+    noFavoritesInQuiz: { fr: 'Aucune question en favoris. Marquez des questions pendant le quiz !', ar: 'لا توجد أسئلة مفضلة. حدد أسئلة أثناء الاختبار!' },
+    favoritesLoadError: { fr: 'Erreur lors du chargement des favoris', ar: 'خطأ في تحميل المفضلة' },
   },
 
   // ==================== QUIZ PLAY ====================
@@ -118,6 +129,8 @@ export const TRANSLATIONS = {
     review: { fr: '📝 Réviser', ar: '📝 مراجعة' },
     markDifficult: { fr: '⭐ Marquer difficile', ar: '⭐ تحديد كصعب' },
     removeFavorite: { fr: '✕ Retirer', ar: '✕ إزالة' },
+    favCount: { fr: 'Favoris', ar: 'المفضلة' },
+    reviewLabel: { fr: 'Réviser', ar: 'مراجعة' },
   },
 
   // ==================== STATS ====================
@@ -130,6 +143,34 @@ export const TRANSLATIONS = {
     byCategory: { fr: 'Par catégorie', ar: 'حسب الفئة' },
     byDifficulty: { fr: 'Par difficulté', ar: 'حسب الصعوبة' },
     reset: { fr: '🗑️ Réinitialiser les statistiques', ar: '🗑️ إعادة تعيين الإحصائيات' },
+  },
+
+  // ==================== HAZARDOUS MATERIALS ====================
+  hazardous: {
+    noQuestions: { fr: 'Aucune question disponible', ar: 'لا توجد أسئلة متاحة' },
+    subtitle: { fr: 'questions • chapitres', ar: 'أسئلة • فصول' },
+    progress: { fr: 'Votre progression', ar: 'تقدمك' },
+    correct: { fr: 'Correctes', ar: 'صحيحة' },
+    train: { fr: 'S\'entraîner', ar: 'تدريب' },
+    quizSubtext: { fr: 'Quiz de 10 questions', ar: 'اختبار من 10 أسئلة' },
+    quickReview: { fr: 'Révision rapide', ar: 'مراجعة سريعة' },
+    courseContent: { fr: 'Contenu du cours', ar: 'محتوى الدرس' },
+    classTable: { fr: 'Tableau des 9 classes', ar: 'جدول الفئات التسع' },
+    class: { fr: 'Classe', ar: 'فئة' },
+    class1: { fr: 'Explosifs', ar: 'المتفجرات' },
+    class2: { fr: 'Gaz', ar: 'الغازات' },
+    class3: { fr: 'Liquides inflammables', ar: 'السوائل القابلة للاشتعال' },
+    class4: { fr: 'Solides inflammables', ar: 'الصلبات القابلة للاشتعال' },
+    class5: { fr: 'Oxydants', ar: 'المؤكسدة' },
+    class6: { fr: 'Substances toxiques', ar: 'المواد السامة' },
+    class7: { fr: 'Radioactives', ar: 'المواد المشعة' },
+    class8: { fr: 'Corrosifs', ar: 'الم-corrosive' },
+    class9: { fr: 'Dangers divers', ar: 'مخاطر متنوعة' },
+    studyHistory: { fr: 'Historique d\'étude', ar: 'سجل الدراسة' },
+    chaptersRead: { fr: 'Chapitres lus', ar: 'فصول مقروءة' },
+    questionsAnswered: { fr: 'Questions répondues', ar: 'أسئلة مجابة' },
+    successRate: { fr: 'Taux de réussite', ar: 'نسبة النجاح' },
+    chapterProgression: { fr: 'Progression par chapitre', ar: 'التقدم حسب الفصل' },
   },
 
   // ==================== COMMON ====================
@@ -161,6 +202,40 @@ export const TRANSLATIONS = {
     next: { fr: 'Suivant →', ar: 'التالي →' },
     markMastered: { fr: '☐ Marquer', ar: '☐ تحديد كمُتقن' },
     masteredBadge: { fr: '✅ Maîtrisé', ar: '✅ مُتقن' },
+    classLabel: { fr: 'Classe', ar: 'فئة' },
+    description: { fr: 'Description:', ar: 'الوصف:' },
+    examples: { fr: 'Exemples:', ar: 'أمثلة:' },
+  },
+
+  // ==================== ACHIEVEMENTS ====================
+  achievements: {
+    firstQuizName: { fr: 'Premier Quiz', ar: 'أول اختبار' },
+    firstQuizDesc: { fr: 'Complétez votre premier quiz', ar: 'أكمل اختبارك الأول' },
+    firstQuizReq: { fr: '1 quiz complété', ar: '1 اختبار مكتمل' },
+    quizApprenticeName: { fr: 'Apprenti Quiz', ar: 'متدرب اختبار' },
+    quizApprenticeDesc: { fr: 'Complétez 5 quiz', ar: 'أكمل 5 اختبارات' },
+    quizApprenticeReq: { fr: '5 quiz complétés', ar: '5 اختبارات مكتملة' },
+    quizMasterName: { fr: 'Maître Quiz', ar: 'خبير الاختبار' },
+    quizMasterDesc: { fr: 'Complétez 10 quiz', ar: 'أكمل 10 اختبارات' },
+    quizMasterReq: { fr: '10 quiz complétés', ar: '10 اختبارات مكتملة' },
+    perfectScoreName: { fr: 'Score Parfait', ar: 'نتيجة مثالية' },
+    perfectScoreDesc: { fr: 'Obtenez 100% à un quiz', ar: 'احصل على 100% في اختبار' },
+    perfectScoreReq: { fr: '100% à un quiz', ar: '100% في اختبار' },
+    weekWarriorName: { fr: 'Guerrier de la Semaine', ar: 'محارب الأسبوع' },
+    weekWarriorDesc: { fr: 'Maintenez une série de 7 jours', ar: 'حافظ على سلسلة من 7 أيام' },
+    weekWarriorReq: { fr: 'Série de 7 jours', ar: 'سلسلة 7 أيام' },
+    hmExplorerName: { fr: 'Explorateur HM', ar: 'مستكشف المواد الخطرة' },
+    hmExplorerDesc: { fr: 'Complétez tous les chapitres des matières dangereuses', ar: 'أكمل جميع فصول المواد الخطرة' },
+    hmExplorerReq: { fr: 'Tous les chapitres HM lus', ar: 'جميع فصول المواد الخطرة مقروءة' },
+    hmFlashcardsName: { fr: 'Maître Flashcards', ar: 'خبير البطاقات' },
+    hmFlashcardsDesc: { fr: 'Maîtrisez toutes les flashcards HM', ar: 'أتقن جميع بطاقات المواد الخطرة' },
+    hmFlashcardsReq: { fr: '9 flashcards maîtrisées', ar: '9 بطاقات مُتقنة' },
+    bookwormName: { fr: 'Bibliophile', ar: 'عاشق الكتب' },
+    bookwormDesc: { fr: 'Ajoutez 5 questions en favoris', ar: 'أضف 5 أسئلة للمفضلة' },
+    bookwormReq: { fr: '5 favoris ajoutés', ar: '5 مفضلات مضافة' },
+    collectorName: { fr: 'Collectionneur', ar: 'جامع' },
+    collectorDesc: { fr: 'Ajoutez 10 questions en favoris', ar: 'أضف 10 أسئلة للمفضلة' },
+    collectorReq: { fr: '10 favoris ajoutés', ar: '10 مفضلات مضافة' },
   },
 
   // ==================== LANGUAGE ====================
@@ -183,6 +258,7 @@ export const TRANSLATIONS = {
     reglement: { fr: 'Règlement', ar: 'اللوائح' },
     panneaux: { fr: 'Panneaux', ar: 'اللافتات' },
     techniques: { fr: 'Techniques', ar: 'التقنيات' },
+    matieres_dangereuses: { fr: 'Matières Dangereuses', ar: 'المواد الخطرة' },
   },
 };
 

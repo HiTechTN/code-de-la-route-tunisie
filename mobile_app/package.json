@@ -1,6 +1,6 @@
 {
   "name": "code-de-la-route-tunisie",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Application mobile complète pour préparer l'examen du code de la route en Tunisie. 130+ questions, 6 modules de cours, quiz et mode examen.",
   "main": "index.js",
   "scripts": {

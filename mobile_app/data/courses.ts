@@ -9,6 +9,7 @@ export type CourseModule = {
   title: string;
   titleAr: string;
   icon: string;
+  image?: string;
   color: string;
   chapters: Chapter[];
 };
@@ -32,6 +33,7 @@ export const COURSE_MODULES: CourseModule[] = [
     title: 'Signalisation et Panneaux',
     titleAr: 'العلامات الإرشادية واللافتات',
     icon: '🪧',
+    image: 'course_images/compressed/signaux_verticaux/_icon.jpg',
     color: '#e74c3c',
     chapters: [
       {
@@ -384,6 +386,7 @@ FEUX AVEUGLES (trois feux du bas en haut):
     title: 'Le Conducteur et le Véhicule',
     titleAr: 'السائق والمركبة',
     icon: '🚗',
+    image: 'course_images/compressed/eclairage_arabes/_icon.jpg',
     color: '#3498db',
     chapters: [
       {
@@ -648,6 +651,7 @@ SANCTIONS:
     title: 'La Priorité',
     titleAr: 'الأولوية',
     icon: '⬆️',
+    image: 'course_images/compressed/priorite/_icon.jpg',
     color: '#f39c12',
     chapters: [
       {
@@ -742,6 +746,7 @@ SANCTIONS:
     title: 'Les Manœuvres',
     titleAr: 'المناورات',
     icon: '🔄',
+    image: 'course_images/compressed/routes_traces/_icon.jpg',
     color: '#9b59b6',
     chapters: [
       {
@@ -921,6 +926,7 @@ STATIONNEMENT EN COTE:
     title: 'Sécurité Routière',
     titleAr: 'الأمان على الطريق',
     icon: '🛡️',
+    image: 'course_images/compressed/routes_traces/_icon.jpg',
     color: '#27ae60',
     chapters: [
       {
@@ -1128,6 +1134,7 @@ CONDUITE DE NUIT:
     title: 'Alcool et Stupéfiants',
     titleAr: 'الخمر والمخدرات',
     icon: '🍷',
+    image: 'course_images/compressed/crimes/_icon.jpg',
     color: '#e67e22',
     chapters: [
       {
@@ -1230,6 +1237,7 @@ CONDUITE DE NUIT:
     title: 'Secourisme',
     titleAr: 'الإسعافات الأولية',
     icon: '🏥',
+    image: 'course_images/compressed/secourisme/_icon.jpg',
     color: '#1abc9c',
     chapters: [
       {
@@ -1332,6 +1340,7 @@ CONDUITE DE NUIT:
     title: 'Éco-conduite',
     titleAr: 'القيادة البيئية',
     icon: '🌿',
+    image: 'course_images/compressed/routes_traces/_icon.jpg',
     color: '#2ecc71',
     chapters: [
       {
@@ -1436,6 +1445,7 @@ CONDUITE DE NUIT:
     title: 'Entretien du Véhicule',
     titleAr: 'صيانة المركبة',
     icon: '🔧',
+    image: 'course_images/compressed/eclairage_arabes/_icon.jpg',
     color: '#8e44ad',
     chapters: [
       {
@@ -1524,6 +1534,7 @@ CONDUITE DE NUIT:
     title: 'Les Infractions',
     titleAr: 'المخالفات',
     icon: '⚖️',
+    image: 'course_images/compressed/crimes/_icon.jpg',
     color: '#c0392b',
     chapters: [
       {
@@ -1622,6 +1633,7 @@ CONDUITE DE NUIT:
     title: 'Transport de Matières Dangereuses',
     titleAr: 'نقل المواد الخطرة',
     icon: '☢️',
+    image: 'course_images/compressed/matieres_dangereuses/_icon.jpg',
     color: '#ff6b35',
     chapters: [
       {
