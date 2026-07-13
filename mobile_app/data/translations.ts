@@ -244,6 +244,16 @@ export const TRANSLATIONS = {
     arabic: { fr: '🇹🇳 عربي', ar: '🇹🇳 تونسي' },
   },
 
+  // ==================== NOTIFICATIONS ====================
+  notifications: {
+    channelName: { fr: 'Rappels d\'entraînement', ar: 'تذكيرات التدريب' },
+    channelDesc: { fr: 'Rappels quotidiens pour vous entraîner', ar: 'تذكيرات يومية للتدريب' },
+    weeklyExamTitle: { fr: '📝 Simulez l\'examen !', ar: '📝 جرّب الامتحان!' },
+    weeklyExamBody: { fr: 'C\'est le moment de faire un test complet de 30 questions comme le vrai examen !', ar: 'حان الوقت لإجراء اختبار كامل من 30 سؤالاً مثل الامتحان الحقيقي!' },
+    testTitle: { fr: '🔔 Test de notification', ar: '🔔 اختبار الإشعارات' },
+    testBody: { fr: 'Les notifications fonctionnent correctement ! Vous recevrez des rappels quotidiens.', ar: 'الإشعارات تعمل بشكل صحيح! ستتلقى تذكيرات يومية.' },
+  },
+
   // ==================== CATEGORY NAMES ====================
   categories: {
     signalisation: { fr: 'Signalisation', ar: 'الإشارات' },
